@@ -5,9 +5,11 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import ShopHeader from '@/components/ShopHeader';
 import CategoryNav from '@/components/CategoryNav';
-import ProductCard, { Product } from '@/components/ProductCard';
+import ProductCard from '@/components/ProductCard';
 import CartSidebar from '@/components/CartSidebar';
-import { products } from '@/data/products';
+import StoreFilter from '@/components/StoreFilter';
+import StoreSummary from '@/components/StoreSummary';
+import { products, Product } from '@/data/products';
 import { useAuth } from '@/hooks/useAuth';
 
 interface CartItem {
@@ -22,6 +24,7 @@ const Index = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [cart, setCart] = useState<Map<string, CartItem>>(new Map());
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [selectedStores, setSelectedStores] = useState<string[]>([]);
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
@@ -31,8 +34,13 @@ const Index = () => {
     });
   }, [activeCategory, searchQuery]);
 
-  const discountedProducts = useMemo(() => {
-    return products.filter((p) => p.discount).slice(0, 6);
+  const dealsProducts = useMemo(() => {
+    return products
+      .filter((p) => {
+        const savings = ((p.mrp - p.bestPrice) / p.mrp) * 100;
+        return savings >= 10;
+      })
+      .slice(0, 6);
   }, []);
 
   const addToCart = (product: Product) => {
@@ -70,14 +78,20 @@ const Index = () => {
     }
   };
 
+  const handleStoreToggle = (store: string) => {
+    setSelectedStores((prev) =>
+      prev.includes(store) ? prev.filter((s) => s !== store) : [...prev, store]
+    );
+  };
+
   const cartCount = Array.from(cart.values()).reduce((sum, item) => sum + item.quantity, 0);
   const cartItems = Array.from(cart.values());
 
   return (
     <>
       <Helmet>
-        <title>GROCERA - Fresh Groceries Delivered in 30 Minutes</title>
-        <meta name="description" content="Order fresh groceries, fruits, vegetables, dairy, and essentials online. Fast delivery in 30-45 minutes. Best prices guaranteed." />
+        <title>GROCERA - Compare Prices Across D-Mart, Reliance & More</title>
+        <meta name="description" content="Compare grocery prices across D-Mart, Reliance Fresh, Big Bazaar and more. Find the best deals and save money on your monthly groceries." />
       </Helmet>
 
       <div className="min-h-screen bg-background">
@@ -88,7 +102,7 @@ const Index = () => {
           onSearchChange={setSearchQuery}
         />
 
-        <main className="max-w-7xl mx-auto px-4 py-6 space-y-8">
+        <main className="max-w-7xl mx-auto px-4 py-6 space-y-6">
           {/* AI Planning Banner */}
           <div className="gradient-hero rounded-2xl p-6 text-primary-foreground relative overflow-hidden">
             <div className="absolute right-0 top-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
@@ -116,6 +130,9 @@ const Index = () => {
             </div>
           </div>
 
+          {/* Store Filter */}
+          <StoreFilter selectedStores={selectedStores} onStoreToggle={handleStoreToggle} />
+
           {/* Quick Stats */}
           <div className="grid grid-cols-3 gap-4">
             <div className="flex items-center gap-3 p-4 bg-card rounded-xl border border-border/50">
@@ -123,8 +140,8 @@ const Index = () => {
                 <Zap className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <p className="text-2xl font-bold">30 min</p>
-                <p className="text-xs text-muted-foreground">Fast Delivery</p>
+                <p className="text-2xl font-bold">6</p>
+                <p className="text-xs text-muted-foreground">Stores Compared</p>
               </div>
             </div>
             <div className="flex items-center gap-3 p-4 bg-card rounded-xl border border-border/50">
@@ -141,34 +158,35 @@ const Index = () => {
                 <TrendingUp className="w-5 h-5 text-green-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold">5000+</p>
+                <p className="text-2xl font-bold">{products.length}+</p>
                 <p className="text-xs text-muted-foreground">Products</p>
               </div>
             </div>
           </div>
 
+          {/* Store Summary for Cart */}
+          {cartItems.length > 0 && <StoreSummary cart={cartItems} />}
+
           {/* Deals Section */}
-          {discountedProducts.length > 0 && (
+          {dealsProducts.length > 0 && (
             <section>
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-display font-bold flex items-center gap-2">
                   <span className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center">
                     <Percent className="w-4 h-4 text-accent" />
                   </span>
-                  Today's Deals
+                  Best Deals Today
                 </h2>
-                <Button variant="ghost" size="sm">
-                  View All <ArrowRight className="w-4 h-4 ml-1" />
-                </Button>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                {discountedProducts.map((product) => (
+                {dealsProducts.map((product) => (
                   <ProductCard
                     key={product.id}
                     product={product}
                     quantity={cart.get(product.id)?.quantity || 0}
                     onAdd={() => addToCart(product)}
                     onRemove={() => removeFromCart(product.id)}
+                    selectedStores={selectedStores}
                   />
                 ))}
               </div>
@@ -203,6 +221,7 @@ const Index = () => {
                     quantity={cart.get(product.id)?.quantity || 0}
                     onAdd={() => addToCart(product)}
                     onRemove={() => removeFromCart(product.id)}
+                    selectedStores={selectedStores}
                   />
                 ))}
               </div>

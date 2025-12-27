@@ -1,6 +1,6 @@
 import { ShoppingCart, X, Trash2, Plus, Minus, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Product } from './ProductCard';
+import { Product } from '@/data/products';
 
 interface CartItem {
   product: Product;
@@ -16,13 +16,9 @@ interface CartSidebarProps {
 }
 
 const CartSidebar = ({ isOpen, onClose, items, onUpdateQuantity, onRemove }: CartSidebarProps) => {
-  const subtotal = items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
-  const savings = items.reduce((sum, item) => {
-    if (item.product.originalPrice) {
-      return sum + (item.product.originalPrice - item.product.price) * item.quantity;
-    }
-    return sum;
-  }, 0);
+  const subtotal = items.reduce((sum, item) => sum + item.product.bestPrice * item.quantity, 0);
+  const mrpTotal = items.reduce((sum, item) => sum + item.product.mrp * item.quantity, 0);
+  const savings = mrpTotal - subtotal;
   const deliveryFee = subtotal > 500 ? 0 : 30;
   const total = subtotal + deliveryFee;
 
@@ -72,7 +68,7 @@ const CartSidebar = ({ isOpen, onClose, items, onUpdateQuantity, onRemove }: Car
                   <h4 className="font-medium text-sm line-clamp-1">{item.product.name}</h4>
                   <p className="text-xs text-muted-foreground">{item.product.unit}</p>
                   <div className="flex items-center justify-between mt-2">
-                    <span className="font-bold">₹{item.product.price * item.quantity}</span>
+                    <span className="font-bold">₹{item.product.bestPrice * item.quantity}</span>
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => onUpdateQuantity(item.product.id, -1)}
