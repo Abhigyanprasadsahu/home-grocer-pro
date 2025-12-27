@@ -14,7 +14,205 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      grocery_items: {
+        Row: {
+          best_price: number | null
+          best_store: string | null
+          category: string
+          created_at: string | null
+          estimated_price: number | null
+          id: string
+          is_purchased: boolean | null
+          list_id: string
+          name: string
+          notes: string | null
+          quantity: number
+          unit: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          best_price?: number | null
+          best_store?: string | null
+          category: string
+          created_at?: string | null
+          estimated_price?: number | null
+          id?: string
+          is_purchased?: boolean | null
+          list_id: string
+          name: string
+          notes?: string | null
+          quantity?: number
+          unit?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          best_price?: number | null
+          best_store?: string | null
+          category?: string
+          created_at?: string | null
+          estimated_price?: number | null
+          id?: string
+          is_purchased?: boolean | null
+          list_id?: string
+          name?: string
+          notes?: string | null
+          quantity?: number
+          unit?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "grocery_items_list_id_fkey"
+            columns: ["list_id"]
+            isOneToOne: false
+            referencedRelation: "grocery_lists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      grocery_lists: {
+        Row: {
+          ai_generated: boolean | null
+          created_at: string | null
+          estimated_savings: number | null
+          household_id: string
+          id: string
+          month: number
+          name: string
+          nutrition_score: number | null
+          status: string | null
+          total_cost: number | null
+          updated_at: string | null
+          user_id: string
+          year: number
+        }
+        Insert: {
+          ai_generated?: boolean | null
+          created_at?: string | null
+          estimated_savings?: number | null
+          household_id: string
+          id?: string
+          month: number
+          name: string
+          nutrition_score?: number | null
+          status?: string | null
+          total_cost?: number | null
+          updated_at?: string | null
+          user_id: string
+          year: number
+        }
+        Update: {
+          ai_generated?: boolean | null
+          created_at?: string | null
+          estimated_savings?: number | null
+          household_id?: string
+          id?: string
+          month?: number
+          name?: string
+          nutrition_score?: number | null
+          status?: string | null
+          total_cost?: number | null
+          updated_at?: string | null
+          user_id?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "grocery_lists_household_id_fkey"
+            columns: ["household_id"]
+            isOneToOne: false
+            referencedRelation: "households"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      households: {
+        Row: {
+          adults: number
+          children: number
+          created_at: string | null
+          diet_preferences:
+            | Database["public"]["Enums"]["diet_preference"][]
+            | null
+          elderly: number
+          family_size: number
+          id: string
+          monthly_budget: number | null
+          name: string
+          preferred_stores: string[] | null
+          special_requirements: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          adults?: number
+          children?: number
+          created_at?: string | null
+          diet_preferences?:
+            | Database["public"]["Enums"]["diet_preference"][]
+            | null
+          elderly?: number
+          family_size?: number
+          id?: string
+          monthly_budget?: number | null
+          name?: string
+          preferred_stores?: string[] | null
+          special_requirements?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          adults?: number
+          children?: number
+          created_at?: string | null
+          diet_preferences?:
+            | Database["public"]["Enums"]["diet_preference"][]
+            | null
+          elderly?: number
+          family_size?: number
+          id?: string
+          monthly_budget?: number | null
+          name?: string
+          preferred_stores?: string[] | null
+          special_requirements?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          full_name: string | null
+          id: string
+          onboarding_completed: boolean | null
+          phone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          full_name?: string | null
+          id: string
+          onboarding_completed?: boolean | null
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          full_name?: string | null
+          id?: string
+          onboarding_completed?: boolean | null
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +221,15 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      diet_preference:
+        | "vegetarian"
+        | "non_vegetarian"
+        | "vegan"
+        | "eggetarian"
+        | "high_protein"
+        | "low_carb"
+        | "diabetic_friendly"
+        | "keto"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +356,17 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      diet_preference: [
+        "vegetarian",
+        "non_vegetarian",
+        "vegan",
+        "eggetarian",
+        "high_protein",
+        "low_carb",
+        "diabetic_friendly",
+        "keto",
+      ],
+    },
   },
 } as const
