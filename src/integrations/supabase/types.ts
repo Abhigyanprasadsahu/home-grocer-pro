@@ -183,6 +183,42 @@ export type Database = {
         }
         Relationships: []
       }
+      products: {
+        Row: {
+          category: string
+          created_at: string | null
+          description: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          name: string
+          unit: string
+          updated_at: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          name: string
+          unit?: string
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          name?: string
+          unit?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -213,12 +249,102 @@ export type Database = {
         }
         Relationships: []
       }
+      store_prices: {
+        Row: {
+          base_price: number
+          created_at: string | null
+          current_price: number
+          discount_percent: number | null
+          id: string
+          is_available: boolean | null
+          last_updated: string | null
+          product_id: string
+          stock_level: number | null
+          store_id: string
+        }
+        Insert: {
+          base_price: number
+          created_at?: string | null
+          current_price: number
+          discount_percent?: number | null
+          id?: string
+          is_available?: boolean | null
+          last_updated?: string | null
+          product_id: string
+          stock_level?: number | null
+          store_id: string
+        }
+        Update: {
+          base_price?: number
+          created_at?: string | null
+          current_price?: number
+          discount_percent?: number | null
+          id?: string
+          is_available?: boolean | null
+          last_updated?: string | null
+          product_id?: string
+          stock_level?: number | null
+          store_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_prices_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "store_prices_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stores: {
+        Row: {
+          color: string | null
+          created_at: string | null
+          delivery_fee: number | null
+          id: string
+          logo_url: string | null
+          min_order: number | null
+          name: string
+          rating: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string | null
+          delivery_fee?: number | null
+          id?: string
+          logo_url?: string | null
+          min_order?: number | null
+          name: string
+          rating?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          color?: string | null
+          created_at?: string | null
+          delivery_fee?: number | null
+          id?: string
+          logo_url?: string | null
+          min_order?: number | null
+          name?: string
+          rating?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      simulate_price_update: { Args: never; Returns: undefined }
     }
     Enums: {
       diet_preference:

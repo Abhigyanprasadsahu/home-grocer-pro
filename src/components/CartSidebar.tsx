@@ -1,9 +1,9 @@
 import { ShoppingCart, X, Trash2, Plus, Minus, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Product } from '@/data/products';
+import { LiveProduct } from '@/hooks/useLivePrices';
 
 interface CartItem {
-  product: Product;
+  product: LiveProduct;
   quantity: number;
 }
 
@@ -16,8 +16,11 @@ interface CartSidebarProps {
 }
 
 const CartSidebar = ({ isOpen, onClose, items, onUpdateQuantity, onRemove }: CartSidebarProps) => {
-  const subtotal = items.reduce((sum, item) => sum + item.product.bestPrice * item.quantity, 0);
-  const mrpTotal = items.reduce((sum, item) => sum + item.product.mrp * item.quantity, 0);
+  const subtotal = items.reduce((sum, item) => {
+    const price = item.product.bestPrice || item.product.priceRange.min;
+    return sum + price * item.quantity;
+  }, 0);
+  const mrpTotal = items.reduce((sum, item) => sum + item.product.priceRange.max * item.quantity, 0);
   const savings = mrpTotal - subtotal;
   const deliveryFee = subtotal > 500 ? 0 : 30;
   const total = subtotal + deliveryFee;
@@ -59,16 +62,14 @@ const CartSidebar = ({ isOpen, onClose, items, onUpdateQuantity, onRemove }: Car
           ) : (
             items.map((item) => (
               <div key={item.product.id} className="flex gap-3 p-3 bg-secondary/30 rounded-lg">
-                <img
-                  src={item.product.image}
-                  alt={item.product.name}
-                  className="w-16 h-16 object-contain bg-card rounded-lg"
-                />
+                <div className="w-16 h-16 bg-card rounded-lg flex items-center justify-center text-3xl">
+                  {item.product.image}
+                </div>
                 <div className="flex-1 min-w-0">
                   <h4 className="font-medium text-sm line-clamp-1">{item.product.name}</h4>
                   <p className="text-xs text-muted-foreground">{item.product.unit}</p>
                   <div className="flex items-center justify-between mt-2">
-                    <span className="font-bold">₹{item.product.bestPrice * item.quantity}</span>
+                    <span className="font-bold">₹{((item.product.bestPrice || item.product.priceRange.min) * item.quantity).toFixed(0)}</span>
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => onUpdateQuantity(item.product.id, -1)}
@@ -103,13 +104,13 @@ const CartSidebar = ({ isOpen, onClose, items, onUpdateQuantity, onRemove }: Car
             {savings > 0 && (
               <div className="flex items-center justify-between text-sm text-green-600 bg-green-500/10 p-2 rounded-lg">
                 <span>You're saving</span>
-                <span className="font-bold">₹{savings}</span>
+                <span className="font-bold">₹{savings.toFixed(0)}</span>
               </div>
             )}
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Subtotal</span>
-                <span>₹{subtotal}</span>
+                <span>₹{subtotal.toFixed(0)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Delivery</span>
@@ -119,15 +120,15 @@ const CartSidebar = ({ isOpen, onClose, items, onUpdateQuantity, onRemove }: Car
               </div>
               {deliveryFee > 0 && (
                 <p className="text-xs text-muted-foreground">
-                  Add ₹{500 - subtotal} more for free delivery
+                  Add ₹{(500 - subtotal).toFixed(0)} more for free delivery
                 </p>
               )}
             </div>
             <div className="flex justify-between font-bold text-lg pt-2 border-t border-border">
               <span>Total</span>
-              <span>₹{total}</span>
+              <span>₹{total.toFixed(0)}</span>
             </div>
-            <Button variant="hero" className="w-full" size="lg">
+            <Button className="w-full" size="lg">
               Proceed to Checkout
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>

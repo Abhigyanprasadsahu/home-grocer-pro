@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Zap, TrendingUp, Percent, ArrowRight, Sparkles } from 'lucide-react';
+import { Zap, TrendingUp, Percent, ArrowRight, Sparkles, RefreshCw, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import ShopHeader from '@/components/ShopHeader';
@@ -9,41 +9,48 @@ import ProductCard from '@/components/ProductCard';
 import CartSidebar from '@/components/CartSidebar';
 import StoreFilter from '@/components/StoreFilter';
 import StoreSummary from '@/components/StoreSummary';
-import { products, Product } from '@/data/products';
+import { useLivePrices, LiveProduct } from '@/hooks/useLivePrices';
 import { useAuth } from '@/hooks/useAuth';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface CartItem {
-  product: Product;
+  product: LiveProduct;
   quantity: number;
 }
 
 const Index = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [activeCategory, setActiveCategory] = useState('all');
+  const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [cart, setCart] = useState<Map<string, CartItem>>(new Map());
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [selectedStores, setSelectedStores] = useState<string[]>([]);
 
+  const { products, stores, isLoading, error, lastUpdated, refresh } = useLivePrices({
+    category: activeCategory,
+    autoRefresh: true,
+    refreshInterval: 30,
+  });
+
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
-      const matchesCategory = activeCategory === 'all' || product.category === activeCategory;
       const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchesCategory && matchesSearch;
+      return matchesSearch;
     });
-  }, [activeCategory, searchQuery]);
+  }, [products, searchQuery]);
 
   const dealsProducts = useMemo(() => {
     return products
       .filter((p) => {
-        const savings = ((p.mrp - p.bestPrice) / p.mrp) * 100;
+        if (!p.bestPrice || !p.priceRange.max) return false;
+        const savings = ((p.priceRange.max - p.bestPrice) / p.priceRange.max) * 100;
         return savings >= 10;
       })
       .slice(0, 6);
-  }, []);
+  }, [products]);
 
-  const addToCart = (product: Product) => {
+  const addToCart = (product: LiveProduct) => {
     setCart((prev) => {
       const newCart = new Map(prev);
       const existing = newCart.get(product.id);
@@ -78,14 +85,20 @@ const Index = () => {
     }
   };
 
-  const handleStoreToggle = (store: string) => {
+  const handleStoreToggle = (storeId: string) => {
     setSelectedStores((prev) =>
-      prev.includes(store) ? prev.filter((s) => s !== store) : [...prev, store]
+      prev.includes(storeId) ? prev.filter((s) => s !== storeId) : [...prev, storeId]
     );
   };
 
   const cartCount = Array.from(cart.values()).reduce((sum, item) => sum + item.quantity, 0);
   const cartItems = Array.from(cart.values());
+
+  const formatLastUpdated = () => {
+    if (!lastUpdated) return '';
+    const date = new Date(lastUpdated);
+    return date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+  };
 
   return (
     <>
@@ -130,8 +143,38 @@ const Index = () => {
             </div>
           </div>
 
+          {/* Live Price Status Bar */}
+          <div className="flex items-center justify-between p-3 bg-card rounded-lg border border-border/50">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1.5">
+                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                <span className="text-sm font-medium text-green-600">Live Prices</span>
+              </div>
+              {lastUpdated && (
+                <span className="text-xs text-muted-foreground flex items-center gap-1">
+                  <Clock className="w-3 h-3" />
+                  Updated {formatLastUpdated()}
+                </span>
+              )}
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={refresh}
+              disabled={isLoading}
+              className="text-primary"
+            >
+              <RefreshCw className={`w-4 h-4 mr-1 ${isLoading ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
+          </div>
+
           {/* Store Filter */}
-          <StoreFilter selectedStores={selectedStores} onStoreToggle={handleStoreToggle} />
+          <StoreFilter 
+            stores={stores}
+            selectedStores={selectedStores} 
+            onStoreToggle={handleStoreToggle} 
+          />
 
           {/* Quick Stats */}
           <div className="grid grid-cols-3 gap-4">
@@ -140,7 +183,7 @@ const Index = () => {
                 <Zap className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <p className="text-2xl font-bold">6</p>
+                <p className="text-2xl font-bold">{stores.length}</p>
                 <p className="text-xs text-muted-foreground">Stores Compared</p>
               </div>
             </div>
@@ -149,7 +192,11 @@ const Index = () => {
                 <Percent className="w-5 h-5 text-accent" />
               </div>
               <div>
-                <p className="text-2xl font-bold">20%</p>
+                <p className="text-2xl font-bold">
+                  {stores.length > 0 
+                    ? Math.round(stores.reduce((acc, s) => acc + s.avgDiscount, 0) / stores.length)
+                    : 0}%
+                </p>
                 <p className="text-xs text-muted-foreground">Avg. Savings</p>
               </div>
             </div>
@@ -165,10 +212,34 @@ const Index = () => {
           </div>
 
           {/* Store Summary for Cart */}
-          {cartItems.length > 0 && <StoreSummary cart={cartItems} />}
+          {cartItems.length > 0 && <StoreSummary cart={cartItems} stores={stores} />}
+
+          {/* Loading State */}
+          {isLoading && products.length === 0 && (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              {Array.from({ length: 12 }).map((_, i) => (
+                <div key={i} className="bg-card rounded-xl border border-border/50 p-4">
+                  <Skeleton className="aspect-square rounded-lg mb-3" />
+                  <Skeleton className="h-4 w-3/4 mb-2" />
+                  <Skeleton className="h-3 w-1/2 mb-3" />
+                  <Skeleton className="h-6 w-1/3" />
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Error State */}
+          {error && (
+            <div className="text-center py-12 bg-destructive/10 rounded-xl">
+              <p className="text-destructive font-medium">{error}</p>
+              <Button variant="outline" onClick={refresh} className="mt-4">
+                Try Again
+              </Button>
+            </div>
+          )}
 
           {/* Deals Section */}
-          {dealsProducts.length > 0 && (
+          {!isLoading && dealsProducts.length > 0 && (
             <section>
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-display font-bold flex items-center gap-2">
@@ -200,33 +271,35 @@ const Index = () => {
           </section>
 
           {/* Products Grid */}
-          <section>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-display font-bold">
-                {activeCategory === 'all' ? 'All Products' : activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)}
-              </h2>
-              <span className="text-sm text-muted-foreground">{filteredProducts.length} items</span>
-            </div>
+          {!isLoading && (
+            <section>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-display font-bold">
+                  {activeCategory === 'All' ? 'All Products' : activeCategory}
+                </h2>
+                <span className="text-sm text-muted-foreground">{filteredProducts.length} items</span>
+              </div>
 
-            {filteredProducts.length === 0 ? (
-              <div className="text-center py-12">
-                <p className="text-muted-foreground">No products found</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-                {filteredProducts.map((product) => (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    quantity={cart.get(product.id)?.quantity || 0}
-                    onAdd={() => addToCart(product)}
-                    onRemove={() => removeFromCart(product.id)}
-                    selectedStores={selectedStores}
-                  />
-                ))}
-              </div>
-            )}
-          </section>
+              {filteredProducts.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground">No products found</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                  {filteredProducts.map((product) => (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      quantity={cart.get(product.id)?.quantity || 0}
+                      onAdd={() => addToCart(product)}
+                      onRemove={() => removeFromCart(product.id)}
+                      selectedStores={selectedStores}
+                    />
+                  ))}
+                </div>
+              )}
+            </section>
+          )}
         </main>
 
         {/* Simple Footer */}
