@@ -1,17 +1,18 @@
-import { Product, stores } from '@/data/products';
+import { LiveProduct, StoreSummary as StoreSummaryType } from '@/hooks/useLivePrices';
 import { ShoppingCart, TrendingDown, Package } from 'lucide-react';
 
 interface CartItem {
-  product: Product;
+  product: LiveProduct;
   quantity: number;
 }
 
 interface StoreSummaryProps {
   cart: CartItem[];
+  stores: StoreSummaryType[];
 }
 
-const StoreSummary = ({ cart }: StoreSummaryProps) => {
-  if (cart.length === 0) return null;
+const StoreSummary = ({ cart, stores }: StoreSummaryProps) => {
+  if (cart.length === 0 || stores.length === 0) return null;
 
   // Calculate totals per store
   const storeAnalysis = stores.map(store => {
@@ -20,7 +21,7 @@ const StoreSummary = ({ cart }: StoreSummaryProps) => {
     let unavailableItems: string[] = [];
 
     cart.forEach(({ product, quantity }) => {
-      const storePrice = product.storePrices.find(sp => sp.store === store.name);
+      const storePrice = product.storePrices.find(sp => sp.storeId === store.id);
       if (storePrice) {
         if (storePrice.available) {
           total += storePrice.price * quantity;
@@ -33,7 +34,7 @@ const StoreSummary = ({ cart }: StoreSummaryProps) => {
 
     return {
       ...store,
-      total,
+      total: Math.round(total),
       availableItems,
       unavailableItems,
       allAvailable: unavailableItems.length === 0,
@@ -46,7 +47,9 @@ const StoreSummary = ({ cart }: StoreSummaryProps) => {
   });
 
   const bestStore = storeAnalysis[0];
-  const mrpTotal = cart.reduce((sum, { product, quantity }) => sum + product.mrp * quantity, 0);
+  const mrpTotal = Math.round(cart.reduce((sum, { product, quantity }) => {
+    return sum + product.priceRange.max * quantity;
+  }, 0));
 
   return (
     <div className="bg-card rounded-xl border border-border p-4">
@@ -82,7 +85,7 @@ const StoreSummary = ({ cart }: StoreSummaryProps) => {
 
       {/* All Stores Comparison */}
       <div className="space-y-2">
-        {storeAnalysis.slice(1).map(store => (
+        {storeAnalysis.slice(1, 4).map(store => (
           <div 
             key={store.id}
             className="flex items-center justify-between p-2 rounded-lg bg-muted/50"
