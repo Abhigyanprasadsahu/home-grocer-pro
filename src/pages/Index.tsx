@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Zap, TrendingUp, Percent, ArrowRight, Sparkles, RefreshCw, Clock } from 'lucide-react';
+import { Zap, TrendingUp, Percent, ArrowRight, Sparkles, RefreshCw, Clock, Gift, Shield, Truck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import ShopHeader from '@/components/ShopHeader';
@@ -9,6 +9,7 @@ import ProductCard from '@/components/ProductCard';
 import CartSidebar from '@/components/CartSidebar';
 import StoreFilter from '@/components/StoreFilter';
 import StoreSummary from '@/components/StoreSummary';
+import AIChatbot from '@/components/AIChatbot';
 import { useLivePrices, LiveProduct } from '@/hooks/useLivePrices';
 import { useAuth } from '@/hooks/useAuth';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -323,6 +324,30 @@ const Index = () => {
               )}
             </section>
           )}
+        {/* Trust Badges */}
+        <section className="grid grid-cols-3 gap-4 py-6">
+          <div className="flex flex-col items-center text-center p-4 bg-card rounded-xl border border-border/50">
+            <div className="p-3 rounded-full bg-primary/10 mb-2">
+              <Truck className="w-6 h-6 text-primary" />
+            </div>
+            <p className="font-semibold text-sm">Free Delivery</p>
+            <p className="text-xs text-muted-foreground">On orders above ₹500</p>
+          </div>
+          <div className="flex flex-col items-center text-center p-4 bg-card rounded-xl border border-border/50">
+            <div className="p-3 rounded-full bg-green-500/10 mb-2">
+              <Shield className="w-6 h-6 text-green-600" />
+            </div>
+            <p className="font-semibold text-sm">100% Fresh</p>
+            <p className="text-xs text-muted-foreground">Quality guaranteed</p>
+          </div>
+          <div className="flex flex-col items-center text-center p-4 bg-card rounded-xl border border-border/50">
+            <div className="p-3 rounded-full bg-accent/10 mb-2">
+              <Gift className="w-6 h-6 text-accent" />
+            </div>
+            <p className="font-semibold text-sm">Best Prices</p>
+            <p className="text-xs text-muted-foreground">Compare & save</p>
+          </div>
+        </section>
         </main>
 
         {/* Simple Footer */}
@@ -354,6 +379,15 @@ const Index = () => {
               return newCart;
             });
           }}
+        />
+
+        {/* AI Chatbot */}
+        <AIChatbot 
+          cart={cartItems.map(item => ({
+            name: item.product.name,
+            quantity: item.quantity,
+            price: item.product.bestPrice || item.product.priceRange.min
+          }))}
         />
       </div>
     </>
