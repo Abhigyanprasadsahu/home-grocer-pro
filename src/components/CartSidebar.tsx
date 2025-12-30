@@ -1,11 +1,33 @@
-import { ShoppingCart, X, Trash2, Plus, Minus, ArrowRight } from 'lucide-react';
+import { useState } from 'react';
+import { ShoppingCart, X, Trash2, Plus, Minus, ArrowRight, Truck, Store, Clock, Zap, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LiveProduct } from '@/hooks/useLivePrices';
+import { cn } from '@/lib/utils';
 
 interface CartItem {
   product: LiveProduct;
   quantity: number;
 }
+
+interface DeliverySlot {
+  id: string;
+  time: string;
+  label: string;
+  price: number;
+  isExpress?: boolean;
+}
+
+const deliverySlots: DeliverySlot[] = [
+  { id: '1', time: '2-4 PM', label: 'Today', price: 0 },
+  { id: '2', time: '6-8 PM', label: 'Today', price: 0 },
+  { id: '3', time: '9-11 AM', label: 'Tomorrow', price: 0 },
+  { id: '4', time: '30 min', label: 'Express', price: 49, isExpress: true },
+];
+
+const pickupLocations = [
+  { id: 'p1', name: 'D-Mart Koramangala', distance: '1.2 km', readyIn: '45 min' },
+  { id: 'p2', name: 'Zepto Dark Store', distance: '0.8 km', readyIn: '15 min' },
+];
 
 interface CartSidebarProps {
   isOpen: boolean;
@@ -16,13 +38,20 @@ interface CartSidebarProps {
 }
 
 const CartSidebar = ({ isOpen, onClose, items, onUpdateQuantity, onRemove }: CartSidebarProps) => {
+  const [showDelivery, setShowDelivery] = useState(false);
+  const [deliveryType, setDeliveryType] = useState<'delivery' | 'pickup'>('delivery');
+  const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
+  const [selectedPickup, setSelectedPickup] = useState<string | null>(null);
+
   const subtotal = items.reduce((sum, item) => {
     const price = item.product.bestPrice || item.product.priceRange.min;
     return sum + price * item.quantity;
   }, 0);
   const mrpTotal = items.reduce((sum, item) => sum + item.product.priceRange.max * item.quantity, 0);
   const savings = mrpTotal - subtotal;
-  const deliveryFee = subtotal > 500 ? 0 : 30;
+  const isFreeDelivery = subtotal >= 500;
+  const selectedSlotData = deliverySlots.find(s => s.id === selectedSlot);
+  const deliveryFee = deliveryType === 'pickup' ? 0 : (isFreeDelivery && !selectedSlotData?.isExpress ? 0 : (selectedSlotData?.price || 30));
   const total = subtotal + deliveryFee;
 
   if (!isOpen) return null;
@@ -107,31 +136,169 @@ const CartSidebar = ({ isOpen, onClose, items, onUpdateQuantity, onRemove }: Car
                 <span className="font-bold">₹{savings.toFixed(0)}</span>
               </div>
             )}
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Subtotal</span>
-                <span>₹{subtotal.toFixed(0)}</span>
+
+            {/* Delivery Options Toggle */}
+            {!showDelivery ? (
+              <>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Subtotal</span>
+                    <span>₹{subtotal.toFixed(0)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Delivery</span>
+                    <span className={deliveryFee === 0 ? 'text-green-600' : ''}>
+                      {deliveryFee === 0 ? 'FREE' : `₹${deliveryFee}`}
+                    </span>
+                  </div>
+                  {!isFreeDelivery && (
+                    <p className="text-xs text-muted-foreground">
+                      Add ₹{(500 - subtotal).toFixed(0)} more for free delivery
+                    </p>
+                  )}
+                </div>
+                <div className="flex justify-between font-bold text-lg pt-2 border-t border-border">
+                  <span>Total</span>
+                  <span>₹{total.toFixed(0)}</span>
+                </div>
+                <Button className="w-full" size="lg" onClick={() => setShowDelivery(true)}>
+                  Choose Delivery
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </>
+            ) : (
+              <div className="space-y-4">
+                {/* Back button */}
+                <button 
+                  onClick={() => setShowDelivery(false)}
+                  className="text-sm text-primary hover:underline"
+                >
+                  ← Back to cart
+                </button>
+
+                {/* Delivery Type Toggle */}
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => setDeliveryType('delivery')}
+                    className={cn(
+                      "flex items-center justify-center gap-2 p-3 rounded-xl border-2 transition-all text-sm font-medium",
+                      deliveryType === 'delivery'
+                        ? "border-primary bg-primary/5 text-primary"
+                        : "border-border hover:border-primary/50"
+                    )}
+                  >
+                    <Truck className="w-4 h-4" />
+                    Delivery
+                  </button>
+                  <button
+                    onClick={() => setDeliveryType('pickup')}
+                    className={cn(
+                      "flex items-center justify-center gap-2 p-3 rounded-xl border-2 transition-all text-sm font-medium",
+                      deliveryType === 'pickup'
+                        ? "border-primary bg-primary/5 text-primary"
+                        : "border-border hover:border-primary/50"
+                    )}
+                  >
+                    <Store className="w-4 h-4" />
+                    Pickup
+                  </button>
+                </div>
+
+                {/* Delivery Slots */}
+                {deliveryType === 'delivery' && (
+                  <div className="space-y-2">
+                    <p className="text-xs font-medium text-muted-foreground">Select slot</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {deliverySlots.map((slot) => (
+                        <button
+                          key={slot.id}
+                          onClick={() => setSelectedSlot(slot.id)}
+                          className={cn(
+                            "p-3 rounded-xl border-2 transition-all text-left relative",
+                            selectedSlot === slot.id
+                              ? "border-primary bg-primary/5"
+                              : "border-border hover:border-primary/50"
+                          )}
+                        >
+                          {slot.isExpress && (
+                            <Zap className="absolute top-2 right-2 w-3 h-3 text-accent" />
+                          )}
+                          <div className="flex items-center gap-1 mb-0.5">
+                            <Clock className="w-3 h-3 text-muted-foreground" />
+                            <span className="text-sm font-semibold">{slot.time}</span>
+                          </div>
+                          <p className="text-xs text-muted-foreground">{slot.label}</p>
+                          <p className="text-xs font-medium text-primary mt-1">
+                            {slot.price === 0 && isFreeDelivery ? 'FREE' : slot.price === 0 ? '₹30' : `₹${slot.price}`}
+                          </p>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Pickup Locations */}
+                {deliveryType === 'pickup' && (
+                  <div className="space-y-2">
+                    <p className="text-xs font-medium text-muted-foreground">Pickup from</p>
+                    {pickupLocations.map((location) => (
+                      <button
+                        key={location.id}
+                        onClick={() => setSelectedPickup(location.id)}
+                        className={cn(
+                          "w-full p-3 rounded-xl border-2 transition-all text-left flex items-center gap-3",
+                          selectedPickup === location.id
+                            ? "border-primary bg-primary/5"
+                            : "border-border hover:border-primary/50"
+                        )}
+                      >
+                        <Store className="w-4 h-4 text-muted-foreground" />
+                        <div className="flex-1">
+                          <p className="text-sm font-semibold">{location.name}</p>
+                          <p className="text-xs text-muted-foreground">{location.distance}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-xs font-medium text-green-600">{location.readyIn}</p>
+                          <p className="text-xs text-muted-foreground">Free</p>
+                        </div>
+                        {selectedPickup === location.id && (
+                          <CheckCircle2 className="w-4 h-4 text-primary" />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* Order Summary */}
+                <div className="space-y-2 text-sm pt-2 border-t border-border">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Subtotal</span>
+                    <span>₹{subtotal.toFixed(0)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">
+                      {deliveryType === 'delivery' ? 'Delivery' : 'Pickup'}
+                    </span>
+                    <span className={deliveryFee === 0 ? 'text-green-600' : ''}>
+                      {deliveryFee === 0 ? 'FREE' : `₹${deliveryFee}`}
+                    </span>
+                  </div>
+                  <div className="flex justify-between font-bold text-lg pt-2 border-t border-border">
+                    <span>Total</span>
+                    <span>₹{total.toFixed(0)}</span>
+                  </div>
+                </div>
+
+                <Button 
+                  className="w-full" 
+                  size="lg"
+                  disabled={(deliveryType === 'delivery' && !selectedSlot) || (deliveryType === 'pickup' && !selectedPickup)}
+                >
+                  Place Order
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
               </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Delivery</span>
-                <span className={deliveryFee === 0 ? 'text-green-600' : ''}>
-                  {deliveryFee === 0 ? 'FREE' : `₹${deliveryFee}`}
-                </span>
-              </div>
-              {deliveryFee > 0 && (
-                <p className="text-xs text-muted-foreground">
-                  Add ₹{(500 - subtotal).toFixed(0)} more for free delivery
-                </p>
-              )}
-            </div>
-            <div className="flex justify-between font-bold text-lg pt-2 border-t border-border">
-              <span>Total</span>
-              <span>₹{total.toFixed(0)}</span>
-            </div>
-            <Button className="w-full" size="lg">
-              Proceed to Checkout
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
+            )}
           </div>
         )}
       </div>
