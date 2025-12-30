@@ -103,8 +103,8 @@ const Index = () => {
   return (
     <>
       <Helmet>
-        <title>GROCERA - Compare Prices Across D-Mart, Reliance & More</title>
-        <meta name="description" content="Compare grocery prices across D-Mart, Reliance Fresh, Big Bazaar and more. Find the best deals and save money on your monthly groceries." />
+        <title>Flash Kart - Compare Prices Across 12+ Stores</title>
+        <meta name="description" content="Compare grocery prices across D-Mart, BigBasket, Zepto and more. Find the best deals and save up to 30% on your groceries." />
       </Helmet>
 
       <div className="min-h-screen bg-background">
@@ -116,30 +116,41 @@ const Index = () => {
         />
 
         <main className="max-w-7xl mx-auto px-4 py-6 space-y-6">
-          {/* AI Planning Banner */}
-          <div className="gradient-hero rounded-2xl p-6 text-primary-foreground relative overflow-hidden">
+          {/* Hero Banner with Stats */}
+          <div className="gradient-hero rounded-2xl p-6 md:p-8 text-primary-foreground relative overflow-hidden">
             <div className="absolute right-0 top-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
-            <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-              <div>
-                <div className="flex items-center gap-2 mb-2">
-                  <Sparkles className="w-5 h-5" />
-                  <span className="text-sm font-medium opacity-90">AI-Powered Planning</span>
+            <div className="absolute left-10 bottom-0 w-32 h-32 bg-white/5 rounded-full translate-y-1/2" />
+            <div className="relative z-10">
+              <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Sparkles className="w-5 h-5" />
+                    <span className="text-sm font-medium bg-white/20 px-3 py-1 rounded-full">AI-Powered Shopping</span>
+                  </div>
+                  <h1 className="text-2xl md:text-3xl lg:text-4xl font-display font-bold mb-3">
+                    Compare. Save. Repeat.
+                  </h1>
+                  <p className="text-primary-foreground/80 max-w-lg text-sm md:text-base">
+                    Live prices from 12+ stores. Save up to 30% on every order with Flash Kart's smart recommendations.
+                  </p>
                 </div>
-                <h2 className="text-2xl md:text-3xl font-display font-bold mb-2">
-                  Smart Monthly Grocery Plans
-                </h2>
-                <p className="text-primary-foreground/80 max-w-lg">
-                  Get personalized grocery lists based on your family size, diet, and budget. Save up to 20% every month.
-                </p>
+                
+                {/* Stats in Banner */}
+                <div className="flex gap-4 lg:gap-6">
+                  <div className="text-center px-4 py-2 bg-white/10 rounded-xl backdrop-blur-sm">
+                    <p className="text-2xl lg:text-3xl font-bold">{stores.length}</p>
+                    <p className="text-xs text-primary-foreground/70">Stores</p>
+                  </div>
+                  <div className="text-center px-4 py-2 bg-white/10 rounded-xl backdrop-blur-sm">
+                    <p className="text-2xl lg:text-3xl font-bold">{products.length}+</p>
+                    <p className="text-xs text-primary-foreground/70">Products</p>
+                  </div>
+                  <div className="text-center px-4 py-2 bg-white/10 rounded-xl backdrop-blur-sm">
+                    <p className="text-2xl lg:text-3xl font-bold">30%</p>
+                    <p className="text-xs text-primary-foreground/70">Max Savings</p>
+                  </div>
+                </div>
               </div>
-              <Button
-                size="lg"
-                className="bg-white text-primary hover:bg-white/90 shadow-lg"
-                onClick={() => navigate(user ? '/dashboard' : '/auth')}
-              >
-                {user ? 'Go to Dashboard' : 'Get Started Free'}
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
             </div>
           </div>
 
@@ -176,37 +187,49 @@ const Index = () => {
             onStoreToggle={handleStoreToggle} 
           />
 
-          {/* Quick Stats */}
-          <div className="grid grid-cols-3 gap-4">
-            <div className="flex items-center gap-3 p-4 bg-card rounded-xl border border-border/50">
-              <div className="p-2 rounded-lg bg-primary/10">
-                <Zap className="w-5 h-5 text-primary" />
+          {/* Quick Action Cards */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <button
+              onClick={() => navigate(user ? '/dashboard' : '/auth')}
+              className="flex items-center gap-3 p-4 bg-card rounded-xl border border-border/50 hover:border-primary/50 hover:shadow-soft transition-all group text-left"
+            >
+              <div className="p-2.5 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <Sparkles className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{stores.length}</p>
-                <p className="text-xs text-muted-foreground">Stores Compared</p>
+                <p className="font-semibold text-foreground">AI Planner</p>
+                <p className="text-xs text-muted-foreground">Smart lists</p>
+              </div>
+            </button>
+            <div className="flex items-center gap-3 p-4 bg-card rounded-xl border border-border/50">
+              <div className="p-2.5 rounded-lg bg-accent/10">
+                <Zap className="w-5 h-5 text-accent" />
+              </div>
+              <div>
+                <p className="font-semibold text-foreground">{stores.length} Stores</p>
+                <p className="text-xs text-muted-foreground">Live prices</p>
               </div>
             </div>
             <div className="flex items-center gap-3 p-4 bg-card rounded-xl border border-border/50">
-              <div className="p-2 rounded-lg bg-accent/10">
-                <Percent className="w-5 h-5 text-accent" />
+              <div className="p-2.5 rounded-lg bg-green-500/10">
+                <Percent className="w-5 h-5 text-green-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold">
+                <p className="font-semibold text-foreground">
                   {stores.length > 0 
                     ? Math.round(stores.reduce((acc, s) => acc + s.avgDiscount, 0) / stores.length)
-                    : 0}%
+                    : 0}% Off
                 </p>
-                <p className="text-xs text-muted-foreground">Avg. Savings</p>
+                <p className="text-xs text-muted-foreground">Avg discount</p>
               </div>
             </div>
             <div className="flex items-center gap-3 p-4 bg-card rounded-xl border border-border/50">
-              <div className="p-2 rounded-lg bg-green-500/10">
-                <TrendingUp className="w-5 h-5 text-green-600" />
+              <div className="p-2.5 rounded-lg bg-blue-500/10">
+                <TrendingUp className="w-5 h-5 text-blue-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{products.length}+</p>
-                <p className="text-xs text-muted-foreground">Products</p>
+                <p className="font-semibold text-foreground">{products.length}+ Items</p>
+                <p className="text-xs text-muted-foreground">Available</p>
               </div>
             </div>
           </div>
@@ -303,13 +326,17 @@ const Index = () => {
         </main>
 
         {/* Simple Footer */}
-        <footer className="border-t border-border mt-12 py-6">
+        <footer className="border-t border-border mt-12 py-6 bg-card/50">
           <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-            <p>© 2024 GROCERA. All rights reserved.</p>
+            <div className="flex items-center gap-2">
+              <Zap className="w-4 h-4 text-primary" />
+              <span className="font-display font-semibold text-foreground">Flash Kart</span>
+              <span>© 2024. All rights reserved.</span>
+            </div>
             <div className="flex gap-4">
-              <a href="#" className="hover:text-foreground">Terms</a>
-              <a href="#" className="hover:text-foreground">Privacy</a>
-              <a href="#" className="hover:text-foreground">Support</a>
+              <a href="#" className="hover:text-foreground transition-colors">Terms</a>
+              <a href="#" className="hover:text-foreground transition-colors">Privacy</a>
+              <a href="#" className="hover:text-foreground transition-colors">Support</a>
             </div>
           </div>
         </footer>
