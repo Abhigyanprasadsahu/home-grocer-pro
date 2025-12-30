@@ -1,9 +1,13 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, ShoppingBasket } from "lucide-react";
+import { Menu, X, Zap, User } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
   const navLinks = [
     { label: "Features", href: "#features" },
@@ -13,15 +17,15 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/50">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-lg border-b border-border/50">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
           <a href="/" className="flex items-center gap-2 group">
             <div className="w-10 h-10 rounded-xl gradient-hero flex items-center justify-center shadow-glow group-hover:scale-105 transition-transform">
-              <ShoppingBasket className="w-5 h-5 text-primary-foreground" />
+              <Zap className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="font-display text-2xl font-bold text-gradient">GROCERA</span>
+            <span className="font-display text-2xl font-bold text-gradient">Flash Kart</span>
           </a>
 
           {/* Desktop Navigation */}
@@ -39,12 +43,16 @@ const Navbar = () => {
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center gap-3">
-            <Button variant="ghost" size="sm">
-              Sign In
-            </Button>
-            <Button variant="hero" size="sm">
-              Get Started Free
-            </Button>
+            {user ? (
+              <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard')}>
+                <User className="w-4 h-4 mr-2" />
+                Dashboard
+              </Button>
+            ) : (
+              <Button variant="ghost" size="sm" onClick={() => navigate('/auth')}>
+                Sign In
+              </Button>
+            )}
           </div>
 
           {/* Mobile Menu Toggle */}
@@ -72,12 +80,15 @@ const Navbar = () => {
                 </a>
               ))}
               <div className="flex flex-col gap-3 pt-4 border-t border-border">
-                <Button variant="ghost" className="justify-center">
-                  Sign In
-                </Button>
-                <Button variant="hero" className="justify-center">
-                  Get Started Free
-                </Button>
+                {user ? (
+                  <Button variant="hero" className="justify-center" onClick={() => navigate('/dashboard')}>
+                    Dashboard
+                  </Button>
+                ) : (
+                  <Button variant="ghost" className="justify-center" onClick={() => navigate('/auth')}>
+                    Sign In
+                  </Button>
+                )}
               </div>
             </div>
           </div>

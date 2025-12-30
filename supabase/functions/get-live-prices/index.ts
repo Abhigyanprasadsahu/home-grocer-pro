@@ -144,7 +144,7 @@ serve(async (req) => {
     // Calculate store summaries
     const storeSummaries = stores?.map(store => {
       const storeProductPrices = prices?.filter(p => p.store_id === store.id) || [];
-      const availableProducts = storeProductPrices.filter(p => p.available).length;
+      const availableProducts = storeProductPrices.filter(p => p.is_available).length;
       const totalProducts = storeProductPrices.length;
       const avgDiscount = storeProductPrices.reduce((acc, p) => acc + (p.discount_percent || 0), 0) / totalProducts || 0;
       
