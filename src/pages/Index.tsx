@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Zap, TrendingUp, Percent, ArrowRight, Sparkles, RefreshCw, Clock, Gift, Shield, Truck } from 'lucide-react';
+import { Zap, TrendingUp, Percent, Sparkles, RefreshCw, Clock, Gift, Shield, Truck, Users, ShoppingCart, MapPin, BadgeCheck, Timer, Flame } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import ShopHeader from '@/components/ShopHeader';
@@ -121,37 +121,64 @@ const Index = () => {
           <div className="gradient-hero rounded-2xl p-6 md:p-8 text-primary-foreground relative overflow-hidden">
             <div className="absolute right-0 top-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
             <div className="absolute left-10 bottom-0 w-32 h-32 bg-white/5 rounded-full translate-y-1/2" />
+            <div className="absolute right-20 bottom-10 w-20 h-20 bg-white/5 rounded-full" />
             <div className="relative z-10">
               <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-3">
-                    <Sparkles className="w-5 h-5" />
-                    <span className="text-sm font-medium bg-white/20 px-3 py-1 rounded-full">AI-Powered Shopping</span>
+                    <Flame className="w-5 h-5 text-amber-300" />
+                    <span className="text-sm font-medium bg-white/20 px-3 py-1 rounded-full">🔥 New Year Sale Live!</span>
                   </div>
                   <h1 className="text-2xl md:text-3xl lg:text-4xl font-display font-bold mb-3">
-                    Compare. Save. Repeat.
+                    India's Smartest Grocery Shopping
                   </h1>
-                  <p className="text-primary-foreground/80 max-w-lg text-sm md:text-base">
-                    Live prices from 12+ stores. Save up to 30% on every order with Flash Kart's smart recommendations.
+                  <p className="text-primary-foreground/90 max-w-lg text-sm md:text-base">
+                    Compare real-time prices from D-Mart, BigBasket, Zepto & 10+ stores. Save ₹500-₹2000 every month!
                   </p>
+                  <div className="flex items-center gap-4 mt-4">
+                    <div className="flex items-center gap-1.5 text-sm">
+                      <BadgeCheck className="w-4 h-4 text-green-300" />
+                      <span>Verified Prices</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-sm">
+                      <Timer className="w-4 h-4 text-amber-300" />
+                      <span>Updated every 30 sec</span>
+                    </div>
+                  </div>
                 </div>
                 
                 {/* Stats in Banner */}
                 <div className="flex gap-4 lg:gap-6">
-                  <div className="text-center px-4 py-2 bg-white/10 rounded-xl backdrop-blur-sm">
+                  <div className="text-center px-4 py-3 bg-white/15 rounded-xl backdrop-blur-sm border border-white/10">
                     <p className="text-2xl lg:text-3xl font-bold">{stores.length}</p>
-                    <p className="text-xs text-primary-foreground/70">Stores</p>
+                    <p className="text-xs text-primary-foreground/80">Live Stores</p>
                   </div>
-                  <div className="text-center px-4 py-2 bg-white/10 rounded-xl backdrop-blur-sm">
-                    <p className="text-2xl lg:text-3xl font-bold">{products.length}+</p>
-                    <p className="text-xs text-primary-foreground/70">Products</p>
+                  <div className="text-center px-4 py-3 bg-white/15 rounded-xl backdrop-blur-sm border border-white/10">
+                    <p className="text-2xl lg:text-3xl font-bold">{products.length}</p>
+                    <p className="text-xs text-primary-foreground/80">Products</p>
                   </div>
-                  <div className="text-center px-4 py-2 bg-white/10 rounded-xl backdrop-blur-sm">
-                    <p className="text-2xl lg:text-3xl font-bold">30%</p>
-                    <p className="text-xs text-primary-foreground/70">Max Savings</p>
+                  <div className="text-center px-4 py-3 bg-white/15 rounded-xl backdrop-blur-sm border border-white/10">
+                    <p className="text-2xl lg:text-3xl font-bold">₹2K+</p>
+                    <p className="text-xs text-primary-foreground/80">Avg Savings/mo</p>
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* Social Proof Banner */}
+          <div className="flex items-center justify-center gap-6 py-3 bg-muted/50 rounded-xl border border-border/50">
+            <div className="flex items-center gap-2 text-sm">
+              <div className="flex -space-x-2">
+                <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center text-xs">👩</div>
+                <div className="w-7 h-7 rounded-full bg-accent/20 flex items-center justify-center text-xs">👨</div>
+                <div className="w-7 h-7 rounded-full bg-green-500/20 flex items-center justify-center text-xs">👩‍💼</div>
+              </div>
+              <span className="text-muted-foreground"><strong className="text-foreground">50,000+</strong> happy shoppers</span>
+            </div>
+            <div className="hidden sm:flex items-center gap-1.5 text-sm">
+              <MapPin className="w-4 h-4 text-primary" />
+              <span className="text-muted-foreground">Delivering to <strong className="text-foreground">Mumbai, Delhi, Bangalore</strong> & more</span>
             </div>
           </div>
 
@@ -192,45 +219,43 @@ const Index = () => {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <button
               onClick={() => navigate(user ? '/dashboard' : '/auth')}
-              className="flex items-center gap-3 p-4 bg-card rounded-xl border border-border/50 hover:border-primary/50 hover:shadow-soft transition-all group text-left"
+              className="flex items-center gap-3 p-4 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl border border-primary/20 hover:border-primary/40 hover:shadow-lg transition-all group text-left"
             >
-              <div className="p-2.5 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+              <div className="p-2.5 rounded-lg bg-primary/20 group-hover:bg-primary/30 transition-colors">
                 <Sparkles className="w-5 h-5 text-primary" />
               </div>
               <div>
                 <p className="font-semibold text-foreground">AI Planner</p>
-                <p className="text-xs text-muted-foreground">Smart lists</p>
+                <p className="text-xs text-muted-foreground">Smart grocery lists</p>
               </div>
             </button>
-            <div className="flex items-center gap-3 p-4 bg-card rounded-xl border border-border/50">
+            <div className="flex items-center gap-3 p-4 bg-card rounded-xl border border-border/50 hover:shadow-md transition-all">
               <div className="p-2.5 rounded-lg bg-accent/10">
-                <Zap className="w-5 h-5 text-accent" />
+                <Users className="w-5 h-5 text-accent" />
               </div>
               <div>
-                <p className="font-semibold text-foreground">{stores.length} Stores</p>
-                <p className="text-xs text-muted-foreground">Live prices</p>
+                <p className="font-semibold text-foreground">50K+ Users</p>
+                <p className="text-xs text-muted-foreground">Trust us daily</p>
               </div>
             </div>
-            <div className="flex items-center gap-3 p-4 bg-card rounded-xl border border-border/50">
+            <div className="flex items-center gap-3 p-4 bg-card rounded-xl border border-border/50 hover:shadow-md transition-all">
               <div className="p-2.5 rounded-lg bg-green-500/10">
                 <Percent className="w-5 h-5 text-green-600" />
               </div>
               <div>
                 <p className="font-semibold text-foreground">
-                  {stores.length > 0 
-                    ? Math.round(stores.reduce((acc, s) => acc + s.avgDiscount, 0) / stores.length)
-                    : 0}% Off
+                  Up to 30% Off
                 </p>
-                <p className="text-xs text-muted-foreground">Avg discount</p>
+                <p className="text-xs text-muted-foreground">Daily deals</p>
               </div>
             </div>
-            <div className="flex items-center gap-3 p-4 bg-card rounded-xl border border-border/50">
+            <div className="flex items-center gap-3 p-4 bg-card rounded-xl border border-border/50 hover:shadow-md transition-all">
               <div className="p-2.5 rounded-lg bg-blue-500/10">
-                <TrendingUp className="w-5 h-5 text-blue-600" />
+                <ShoppingCart className="w-5 h-5 text-blue-600" />
               </div>
               <div>
-                <p className="font-semibold text-foreground">{products.length}+ Items</p>
-                <p className="text-xs text-muted-foreground">Available</p>
+                <p className="font-semibold text-foreground">₹2 Cr+ Saved</p>
+                <p className="text-xs text-muted-foreground">By our users</p>
               </div>
             </div>
           </div>
@@ -325,43 +350,77 @@ const Index = () => {
             </section>
           )}
         {/* Trust Badges */}
-        <section className="grid grid-cols-3 gap-4 py-6">
-          <div className="flex flex-col items-center text-center p-4 bg-card rounded-xl border border-border/50">
-            <div className="p-3 rounded-full bg-primary/10 mb-2">
+        <section className="grid grid-cols-2 md:grid-cols-4 gap-4 py-6">
+          <div className="flex flex-col items-center text-center p-4 bg-card rounded-xl border border-border/50 hover:shadow-md transition-all">
+            <div className="p-3 rounded-full bg-primary/10 mb-3">
               <Truck className="w-6 h-6 text-primary" />
             </div>
             <p className="font-semibold text-sm">Free Delivery</p>
-            <p className="text-xs text-muted-foreground">On orders above ₹500</p>
+            <p className="text-xs text-muted-foreground">On orders ₹500+</p>
           </div>
-          <div className="flex flex-col items-center text-center p-4 bg-card rounded-xl border border-border/50">
-            <div className="p-3 rounded-full bg-green-500/10 mb-2">
+          <div className="flex flex-col items-center text-center p-4 bg-card rounded-xl border border-border/50 hover:shadow-md transition-all">
+            <div className="p-3 rounded-full bg-green-500/10 mb-3">
               <Shield className="w-6 h-6 text-green-600" />
             </div>
             <p className="font-semibold text-sm">100% Fresh</p>
             <p className="text-xs text-muted-foreground">Quality guaranteed</p>
           </div>
-          <div className="flex flex-col items-center text-center p-4 bg-card rounded-xl border border-border/50">
-            <div className="p-3 rounded-full bg-accent/10 mb-2">
+          <div className="flex flex-col items-center text-center p-4 bg-card rounded-xl border border-border/50 hover:shadow-md transition-all">
+            <div className="p-3 rounded-full bg-accent/10 mb-3">
               <Gift className="w-6 h-6 text-accent" />
             </div>
             <p className="font-semibold text-sm">Best Prices</p>
-            <p className="text-xs text-muted-foreground">Compare & save</p>
+            <p className="text-xs text-muted-foreground">Lowest guaranteed</p>
+          </div>
+          <div className="flex flex-col items-center text-center p-4 bg-card rounded-xl border border-border/50 hover:shadow-md transition-all">
+            <div className="p-3 rounded-full bg-blue-500/10 mb-3">
+              <Clock className="w-6 h-6 text-blue-600" />
+            </div>
+            <p className="font-semibold text-sm">10 Min Delivery</p>
+            <p className="text-xs text-muted-foreground">Select stores</p>
           </div>
         </section>
         </main>
 
-        {/* Simple Footer */}
-        <footer className="border-t border-border mt-12 py-6 bg-card/50">
-          <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <Zap className="w-4 h-4 text-primary" />
-              <span className="font-display font-semibold text-foreground">Flash Kart</span>
-              <span>© 2024. All rights reserved.</span>
+        {/* Footer */}
+        <footer className="border-t border-border mt-12 py-8 bg-card/50">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="grid md:grid-cols-4 gap-8 mb-8">
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <Zap className="w-5 h-5 text-primary" />
+                  <span className="font-display font-bold text-lg text-foreground">Flash Kart</span>
+                </div>
+                <p className="text-sm text-muted-foreground">India's smartest grocery price comparison platform. Save money on every purchase.</p>
+              </div>
+              <div>
+                <h4 className="font-semibold mb-3 text-foreground">Quick Links</h4>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li><a href="#" className="hover:text-foreground transition-colors">How it works</a></li>
+                  <li><a href="#" className="hover:text-foreground transition-colors">Partner Stores</a></li>
+                  <li><a href="#" className="hover:text-foreground transition-colors">Download App</a></li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-semibold mb-3 text-foreground">Support</h4>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li><a href="#" className="hover:text-foreground transition-colors">Help Center</a></li>
+                  <li><a href="#" className="hover:text-foreground transition-colors">Contact Us</a></li>
+                  <li><a href="#" className="hover:text-foreground transition-colors">FAQs</a></li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-semibold mb-3 text-foreground">Legal</h4>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li><a href="#" className="hover:text-foreground transition-colors">Privacy Policy</a></li>
+                  <li><a href="#" className="hover:text-foreground transition-colors">Terms of Service</a></li>
+                  <li><a href="#" className="hover:text-foreground transition-colors">Refund Policy</a></li>
+                </ul>
+              </div>
             </div>
-            <div className="flex gap-4">
-              <a href="#" className="hover:text-foreground transition-colors">Terms</a>
-              <a href="#" className="hover:text-foreground transition-colors">Privacy</a>
-              <a href="#" className="hover:text-foreground transition-colors">Support</a>
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-border text-sm text-muted-foreground">
+              <span>© 2026 Flash Kart. All rights reserved.</span>
+              <span className="flex items-center gap-1">Made with 🧡 in India</span>
             </div>
           </div>
         </footer>
