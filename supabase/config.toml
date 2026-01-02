@@ -8,3 +8,15 @@ verify_jwt = false
 
 [functions.ai-chat]
 verify_jwt = false
+
+[functions.ai-recipe-suggestions]
+verify_jwt = false
+
+[functions.ai-price-predictor]
+verify_jwt = false
+
+[functions.ai-nutrition-analyzer]
+verify_jwt = false
+
+[functions.ai-smart-search]
+verify_jwt = false
