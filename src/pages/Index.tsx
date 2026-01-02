@@ -147,34 +147,36 @@ const Index = () => {
                   </div>
                 </div>
                 
-                {/* Stats in Banner */}
+                {/* AI Features Highlight */}
                 <div className="flex gap-4 lg:gap-6">
                   <div className="text-center px-4 py-3 bg-white/15 rounded-xl backdrop-blur-sm border border-white/10">
-                    <p className="text-2xl lg:text-3xl font-bold">{stores.length}</p>
-                    <p className="text-xs text-primary-foreground/80">Live Stores</p>
+                    <div className="flex justify-center mb-1">
+                      <Sparkles className="w-5 h-5 text-amber-300" />
+                    </div>
+                    <p className="text-xs text-primary-foreground/80">AI Shopping</p>
                   </div>
                   <div className="text-center px-4 py-3 bg-white/15 rounded-xl backdrop-blur-sm border border-white/10">
-                    <p className="text-2xl lg:text-3xl font-bold">{products.length}</p>
-                    <p className="text-xs text-primary-foreground/80">Products</p>
+                    <div className="flex justify-center mb-1">
+                      <Zap className="w-5 h-5 text-green-300" />
+                    </div>
+                    <p className="text-xs text-primary-foreground/80">Smart Deals</p>
                   </div>
                   <div className="text-center px-4 py-3 bg-white/15 rounded-xl backdrop-blur-sm border border-white/10">
-                    <p className="text-2xl lg:text-3xl font-bold">₹2K+</p>
-                    <p className="text-xs text-primary-foreground/80">Avg Savings/mo</p>
+                    <div className="flex justify-center mb-1">
+                      <TrendingUp className="w-5 h-5 text-blue-300" />
+                    </div>
+                    <p className="text-xs text-primary-foreground/80">Price Tracking</p>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Social Proof Banner */}
-          <div className="flex items-center justify-center gap-6 py-3 bg-muted/50 rounded-xl border border-border/50">
+          {/* AI Powered Banner */}
+          <div className="flex items-center justify-center gap-6 py-3 bg-gradient-to-r from-primary/5 via-accent/5 to-primary/5 rounded-xl border border-primary/20">
             <div className="flex items-center gap-2 text-sm">
-              <div className="flex -space-x-2">
-                <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center text-xs">👩</div>
-                <div className="w-7 h-7 rounded-full bg-accent/20 flex items-center justify-center text-xs">👨</div>
-                <div className="w-7 h-7 rounded-full bg-green-500/20 flex items-center justify-center text-xs">👩‍💼</div>
-              </div>
-              <span className="text-muted-foreground"><strong className="text-foreground">50,000+</strong> happy shoppers</span>
+              <Sparkles className="w-4 h-4 text-primary animate-pulse" />
+              <span className="text-muted-foreground">Powered by <strong className="text-foreground">Gemini AI</strong> & <strong className="text-foreground">GPT-5</strong></span>
             </div>
             <div className="hidden sm:flex items-center gap-1.5 text-sm">
               <MapPin className="w-4 h-4 text-primary" />
@@ -215,7 +217,7 @@ const Index = () => {
             onStoreToggle={handleStoreToggle} 
           />
 
-          {/* Quick Action Cards */}
+          {/* AI-Powered Quick Action Cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <button
               onClick={() => navigate(user ? '/dashboard' : '/auth')}
@@ -229,33 +231,31 @@ const Index = () => {
                 <p className="text-xs text-muted-foreground">Smart grocery lists</p>
               </div>
             </button>
-            <div className="flex items-center gap-3 p-4 bg-card rounded-xl border border-border/50 hover:shadow-md transition-all">
-              <div className="p-2.5 rounded-lg bg-accent/10">
-                <Users className="w-5 h-5 text-accent" />
+            <div className="flex items-center gap-3 p-4 bg-gradient-to-br from-accent/10 to-accent/5 rounded-xl border border-accent/20 hover:shadow-md transition-all">
+              <div className="p-2.5 rounded-lg bg-accent/20">
+                <TrendingUp className="w-5 h-5 text-accent" />
               </div>
               <div>
-                <p className="font-semibold text-foreground">50K+ Users</p>
-                <p className="text-xs text-muted-foreground">Trust us daily</p>
+                <p className="font-semibold text-foreground">AI Price Alerts</p>
+                <p className="text-xs text-muted-foreground">Smart notifications</p>
               </div>
             </div>
-            <div className="flex items-center gap-3 p-4 bg-card rounded-xl border border-border/50 hover:shadow-md transition-all">
-              <div className="p-2.5 rounded-lg bg-green-500/10">
+            <div className="flex items-center gap-3 p-4 bg-gradient-to-br from-green-500/10 to-green-500/5 rounded-xl border border-green-500/20 hover:shadow-md transition-all">
+              <div className="p-2.5 rounded-lg bg-green-500/20">
                 <Percent className="w-5 h-5 text-green-600" />
               </div>
               <div>
-                <p className="font-semibold text-foreground">
-                  Up to 30% Off
-                </p>
-                <p className="text-xs text-muted-foreground">Daily deals</p>
+                <p className="font-semibold text-foreground">AI Deal Finder</p>
+                <p className="text-xs text-muted-foreground">Best prices found</p>
               </div>
             </div>
-            <div className="flex items-center gap-3 p-4 bg-card rounded-xl border border-border/50 hover:shadow-md transition-all">
-              <div className="p-2.5 rounded-lg bg-blue-500/10">
+            <div className="flex items-center gap-3 p-4 bg-gradient-to-br from-blue-500/10 to-blue-500/5 rounded-xl border border-blue-500/20 hover:shadow-md transition-all">
+              <div className="p-2.5 rounded-lg bg-blue-500/20">
                 <ShoppingCart className="w-5 h-5 text-blue-600" />
               </div>
               <div>
-                <p className="font-semibold text-foreground">₹2 Cr+ Saved</p>
-                <p className="text-xs text-muted-foreground">By our users</p>
+                <p className="font-semibold text-foreground">Smart Cart</p>
+                <p className="text-xs text-muted-foreground">AI optimized</p>
               </div>
             </div>
           </div>

@@ -6,10 +6,10 @@ import heroImage from "@/assets/hero-groceries.jpg";
 const HeroSection = () => {
   const navigate = useNavigate();
 
-  const stats = [
-    { icon: Users, value: "10K+", label: "Happy Families" },
-    { icon: TrendingDown, value: "30%", label: "Avg Savings" },
-    { icon: Truck, value: "500+", label: "Daily Deliveries" },
+  const aiFeatures = [
+    { icon: Sparkles, label: "AI-Powered Shopping" },
+    { icon: TrendingDown, label: "Smart Price Tracking" },
+    { icon: Zap, label: "Instant Recommendations" },
   ];
 
   const features = [
@@ -68,17 +68,12 @@ const HeroSection = () => {
               </Button>
             </div>
 
-            {/* Stats */}
-            <div className="flex flex-wrap gap-8 pt-8 border-t border-border">
-              {stats.map((stat) => (
-                <div key={stat.label} className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20">
-                    <stat.icon className="w-6 h-6 text-primary" />
-                  </div>
-                  <div>
-                    <div className="font-display text-2xl font-bold text-gradient">{stat.value}</div>
-                    <div className="text-sm text-muted-foreground">{stat.label}</div>
-                  </div>
+            {/* AI Features */}
+            <div className="flex flex-wrap gap-4 pt-8 border-t border-border">
+              {aiFeatures.map((feature) => (
+                <div key={feature.label} className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
+                  <feature.icon className="w-4 h-4 text-primary" />
+                  <span className="text-sm font-medium text-foreground">{feature.label}</span>
                 </div>
               ))}
             </div>
