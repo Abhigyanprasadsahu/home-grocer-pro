@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Zap, TrendingUp, Percent, Sparkles, RefreshCw, Clock, Gift, Shield, Truck, Users, ShoppingCart, MapPin, BadgeCheck, Timer, Flame } from 'lucide-react';
+import { Zap, TrendingUp, Percent, Sparkles, RefreshCw, Clock, Gift, Shield, Truck, Users, ShoppingCart, MapPin, BadgeCheck, Timer, Flame, ChefHat } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import ShopHeader from '@/components/ShopHeader';
@@ -10,6 +10,7 @@ import CartSidebar from '@/components/CartSidebar';
 import StoreFilter from '@/components/StoreFilter';
 import StoreSummary from '@/components/StoreSummary';
 import AIChatbot from '@/components/AIChatbot';
+import AIRecipeFinder from '@/components/AIRecipeFinder';
 import { useLivePrices, LiveProduct } from '@/hooks/useLivePrices';
 import { useAuth } from '@/hooks/useAuth';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -27,6 +28,7 @@ const Index = () => {
   const [cart, setCart] = useState<Map<string, CartItem>>(new Map());
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [selectedStores, setSelectedStores] = useState<string[]>([]);
+  const [isRecipeFinderOpen, setIsRecipeFinderOpen] = useState(false);
 
   const { products, stores, isLoading, error, lastUpdated, refresh } = useLivePrices({
     category: activeCategory,
@@ -349,6 +351,30 @@ const Index = () => {
               )}
             </section>
           )}
+        {/* AI Recipe Finder Card */}
+        <section className="py-4">
+          <div 
+            onClick={() => setIsRecipeFinderOpen(true)}
+            className="p-6 bg-gradient-to-r from-accent/10 via-primary/5 to-accent/10 rounded-2xl border border-accent/20 cursor-pointer hover:shadow-lg transition-all group"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-xl bg-accent/20 group-hover:bg-accent/30 transition-colors">
+                  <ChefHat className="w-8 h-8 text-accent" />
+                </div>
+                <div>
+                  <h3 className="font-display font-bold text-lg mb-1">AI Recipe Finder</h3>
+                  <p className="text-sm text-muted-foreground">Tell us what ingredients you have and get personalized recipes instantly</p>
+                </div>
+              </div>
+              <Button variant="hero" className="hidden sm:flex gap-2">
+                <Sparkles className="w-4 h-4" />
+                Find Recipes
+              </Button>
+            </div>
+          </div>
+        </section>
+
         {/* Trust Badges */}
         <section className="grid grid-cols-2 md:grid-cols-4 gap-4 py-6">
           <div className="flex flex-col items-center text-center p-4 bg-card rounded-xl border border-border/50 hover:shadow-md transition-all">
@@ -447,6 +473,13 @@ const Index = () => {
             quantity: item.quantity,
             price: item.product.bestPrice || item.product.priceRange.min
           }))}
+        />
+
+        {/* AI Recipe Finder Modal */}
+        <AIRecipeFinder 
+          isOpen={isRecipeFinderOpen} 
+          onClose={() => setIsRecipeFinderOpen(false)}
+          initialIngredients={cartItems.map(item => item.product.name)}
         />
       </div>
     </>
