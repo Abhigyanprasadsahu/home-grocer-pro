@@ -28,7 +28,7 @@ const ShopHeader = ({ cartCount, onCartClick, searchQuery, onSearchChange, onAdd
         <div className="bg-primary/10 px-4 py-1.5 text-center">
           <p className="text-xs font-medium text-primary flex items-center justify-center gap-2">
             <Truck className="w-3 h-3" />
-            Free delivery on orders above ₹500 • Same day delivery available
+            🚚 FREE delivery on bulk orders ₹2500+ • Small orders: ₹100 delivery
           </p>
         </div>
 

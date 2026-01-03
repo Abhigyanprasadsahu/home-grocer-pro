@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ShoppingCart, X, Trash2, Plus, Minus, ArrowRight, Truck, Store, Clock, Zap, CheckCircle2 } from 'lucide-react';
+import { ShoppingCart, X, Trash2, Plus, Minus, ArrowRight, Truck, Store, Clock, Zap, CheckCircle2, Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LiveProduct } from '@/hooks/useLivePrices';
 import { cn } from '@/lib/utils';
@@ -25,9 +25,14 @@ const deliverySlots: DeliverySlot[] = [
 ];
 
 const pickupLocations = [
-  { id: 'p1', name: 'D-Mart Koramangala', distance: '1.2 km', readyIn: '45 min' },
-  { id: 'p2', name: 'Zepto Dark Store', distance: '0.8 km', readyIn: '15 min' },
+  { id: 'p1', name: 'Sharma General Store', distance: '1.2 km', readyIn: '45 min' },
+  { id: 'p2', name: 'Fresh Mart Kirana', distance: '0.8 km', readyIn: '20 min' },
+  { id: 'p3', name: 'City Grocers', distance: '1.5 km', readyIn: '30 min' },
 ];
+
+// Delivery pricing constants
+const BULK_FREE_DELIVERY_THRESHOLD = 2500;
+const SMALL_ORDER_DELIVERY_FEE = 100;
 
 interface CartSidebarProps {
   isOpen: boolean;
@@ -49,10 +54,22 @@ const CartSidebar = ({ isOpen, onClose, items, onUpdateQuantity, onRemove }: Car
   }, 0);
   const mrpTotal = items.reduce((sum, item) => sum + item.product.priceRange.max * item.quantity, 0);
   const savings = mrpTotal - subtotal;
-  const isFreeDelivery = subtotal >= 500;
+  
+  // Bulk order: free delivery above ₹2500, otherwise ₹100 delivery fee
+  const isBulkOrder = subtotal >= BULK_FREE_DELIVERY_THRESHOLD;
   const selectedSlotData = deliverySlots.find(s => s.id === selectedSlot);
-  const deliveryFee = deliveryType === 'pickup' ? 0 : (isFreeDelivery && !selectedSlotData?.isExpress ? 0 : (selectedSlotData?.price || 30));
+  
+  // Calculate delivery fee based on order size
+  const getDeliveryFee = () => {
+    if (deliveryType === 'pickup') return 0;
+    if (selectedSlotData?.isExpress) return selectedSlotData.price; // Express always costs
+    if (isBulkOrder) return 0; // Free delivery for bulk orders (₹2500+)
+    return SMALL_ORDER_DELIVERY_FEE; // ₹100 for small orders
+  };
+  
+  const deliveryFee = getDeliveryFee();
   const total = subtotal + deliveryFee;
+  const amountForFreeDelivery = BULK_FREE_DELIVERY_THRESHOLD - subtotal;
 
   if (!isOpen) return null;
 
@@ -79,6 +96,25 @@ const CartSidebar = ({ isOpen, onClose, items, onUpdateQuantity, onRemove }: Car
             <X className="w-5 h-5" />
           </button>
         </div>
+
+        {/* Bulk Order Banner */}
+        {items.length > 0 && !isBulkOrder && (
+          <div className="px-4 py-2 bg-primary/10 border-b border-primary/20">
+            <p className="text-xs text-primary font-medium flex items-center gap-2">
+              <Package className="w-4 h-4" />
+              Add ₹{Math.round(amountForFreeDelivery)} more for FREE delivery (Bulk Order)
+            </p>
+          </div>
+        )}
+        
+        {items.length > 0 && isBulkOrder && (
+          <div className="px-4 py-2 bg-green-500/10 border-b border-green-500/20">
+            <p className="text-xs text-green-600 font-medium flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4" />
+              🎉 Bulk Order - You get FREE delivery!
+            </p>
+          </div>
+        )}
 
         {/* Items */}
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
@@ -147,13 +183,13 @@ const CartSidebar = ({ isOpen, onClose, items, onUpdateQuantity, onRemove }: Car
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Delivery</span>
-                    <span className={deliveryFee === 0 ? 'text-green-600' : ''}>
+                    <span className={deliveryFee === 0 ? 'text-green-600 font-medium' : 'text-foreground'}>
                       {deliveryFee === 0 ? 'FREE' : `₹${deliveryFee}`}
                     </span>
                   </div>
-                  {!isFreeDelivery && (
-                    <p className="text-xs text-muted-foreground">
-                      Add ₹{(500 - subtotal).toFixed(0)} more for free delivery
+                  {!isBulkOrder && (
+                    <p className="text-xs text-muted-foreground bg-secondary/50 p-2 rounded">
+                      💡 Add ₹{Math.round(amountForFreeDelivery)} more for FREE bulk delivery
                     </p>
                   )}
                 </div>
@@ -229,7 +265,10 @@ const CartSidebar = ({ isOpen, onClose, items, onUpdateQuantity, onRemove }: Car
                           </div>
                           <p className="text-xs text-muted-foreground">{slot.label}</p>
                           <p className="text-xs font-medium text-primary mt-1">
-                            {slot.price === 0 && isFreeDelivery ? 'FREE' : slot.price === 0 ? '₹30' : `₹${slot.price}`}
+                            {slot.isExpress 
+                              ? `₹${slot.price}` 
+                              : (isBulkOrder ? 'FREE' : `₹${SMALL_ORDER_DELIVERY_FEE}`)
+                            }
                           </p>
                         </button>
                       ))}
@@ -240,7 +279,7 @@ const CartSidebar = ({ isOpen, onClose, items, onUpdateQuantity, onRemove }: Car
                 {/* Pickup Locations */}
                 {deliveryType === 'pickup' && (
                   <div className="space-y-2">
-                    <p className="text-xs font-medium text-muted-foreground">Pickup from</p>
+                    <p className="text-xs font-medium text-muted-foreground">Pickup from Kirana Partner</p>
                     {pickupLocations.map((location) => (
                       <button
                         key={location.id}
@@ -279,7 +318,7 @@ const CartSidebar = ({ isOpen, onClose, items, onUpdateQuantity, onRemove }: Car
                     <span className="text-muted-foreground">
                       {deliveryType === 'delivery' ? 'Delivery' : 'Pickup'}
                     </span>
-                    <span className={deliveryFee === 0 ? 'text-green-600' : ''}>
+                    <span className={deliveryFee === 0 ? 'text-green-600 font-medium' : ''}>
                       {deliveryFee === 0 ? 'FREE' : `₹${deliveryFee}`}
                     </span>
                   </div>

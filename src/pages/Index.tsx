@@ -399,8 +399,8 @@ const Index = () => {
             <div className="p-3 rounded-full bg-primary/10 mb-3">
               <Truck className="w-6 h-6 text-primary" />
             </div>
-            <p className="font-semibold text-sm">Free Delivery</p>
-            <p className="text-xs text-muted-foreground">On orders ₹500+</p>
+            <p className="font-semibold text-sm">Free Bulk Delivery</p>
+            <p className="text-xs text-muted-foreground">On orders ₹2500+</p>
           </div>
           <div className="flex flex-col items-center text-center p-4 bg-card rounded-xl border border-border/50 hover:shadow-md transition-all">
             <div className="p-3 rounded-full bg-green-500/10 mb-3">
@@ -522,6 +522,7 @@ const Index = () => {
           isOpen={isSmartCartOpen} 
           onClose={() => setIsSmartCartOpen(false)}
           cartItems={cartItems}
+          stores={stores}
         />
 
         {/* Delivery Address Manager Modal */}
