@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Zap, TrendingUp, Percent, Sparkles, RefreshCw, Clock, Gift, Shield, Truck, Users, ShoppingCart, MapPin, BadgeCheck, Timer, Flame, ChefHat, Bell } from 'lucide-react';
+import { Zap, TrendingUp, Percent, Sparkles, RefreshCw, Clock, Gift, Shield, Truck, Users, ShoppingCart, MapPin, BadgeCheck, Timer, Flame, ChefHat, Bell, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import ShopHeader from '@/components/ShopHeader';
@@ -15,6 +15,7 @@ import AIDealFinder from '@/components/AIDealFinder';
 import AIPriceAlerts from '@/components/AIPriceAlerts';
 import SmartCart from '@/components/SmartCart';
 import DeliveryAddressManager from '@/components/DeliveryAddressManager';
+import Wishlist from '@/components/Wishlist';
 import { useLivePrices, LiveProduct } from '@/hooks/useLivePrices';
 import { useAuth } from '@/hooks/useAuth';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -37,6 +38,7 @@ const Index = () => {
   const [isPriceAlertsOpen, setIsPriceAlertsOpen] = useState(false);
   const [isSmartCartOpen, setIsSmartCartOpen] = useState(false);
   const [isAddressManagerOpen, setIsAddressManagerOpen] = useState(false);
+  const [isWishlistOpen, setIsWishlistOpen] = useState(false);
 
   const { products, stores, isLoading, error, lastUpdated, refresh } = useLivePrices({
     category: activeCategory,
@@ -229,7 +231,7 @@ const Index = () => {
           />
 
           {/* AI-Powered Quick Action Cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
             <button
               onClick={() => navigate(user ? '/dashboard' : '/auth')}
               className="flex items-center gap-3 p-4 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl border border-primary/20 hover:border-primary/40 hover:shadow-lg transition-all group text-left"
@@ -276,6 +278,18 @@ const Index = () => {
               <div>
                 <p className="font-semibold text-foreground">Smart Cart</p>
                 <p className="text-xs text-muted-foreground">AI optimized</p>
+              </div>
+            </button>
+            <button
+              onClick={() => setIsWishlistOpen(true)}
+              className="flex items-center gap-3 p-4 bg-gradient-to-br from-red-500/10 to-red-500/5 rounded-xl border border-red-500/20 hover:border-red-500/40 hover:shadow-lg transition-all group text-left"
+            >
+              <div className="p-2.5 rounded-lg bg-red-500/20 group-hover:bg-red-500/30 transition-colors">
+                <Heart className="w-5 h-5 text-red-500" />
+              </div>
+              <div>
+                <p className="font-semibold text-foreground">My Wishlist</p>
+                <p className="text-xs text-muted-foreground">Price alerts</p>
               </div>
             </button>
           </div>
@@ -529,6 +543,13 @@ const Index = () => {
         <DeliveryAddressManager 
           isOpen={isAddressManagerOpen} 
           onClose={() => setIsAddressManagerOpen(false)}
+        />
+
+        {/* Wishlist Modal */}
+        <Wishlist 
+          isOpen={isWishlistOpen} 
+          onClose={() => setIsWishlistOpen(false)}
+          onAddToCart={addToCart}
         />
       </div>
     </>

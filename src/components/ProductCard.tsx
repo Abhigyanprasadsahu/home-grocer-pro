@@ -1,8 +1,9 @@
-import { Plus, Minus, TrendingDown, Check, X, Store, Star, Clock } from 'lucide-react';
+import { Plus, Minus, TrendingDown, Check, X, Store, Star, Clock, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LiveProduct } from '@/hooks/useLivePrices';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { useWishlist } from '@/hooks/useWishlist';
 
 interface ProductCardProps {
   product: LiveProduct;
@@ -14,6 +15,9 @@ interface ProductCardProps {
 
 const ProductCard = ({ product, quantity, onAdd, onRemove, selectedStores }: ProductCardProps) => {
   const [showPrices, setShowPrices] = useState(false);
+  const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
+  
+  const inWishlist = isInWishlist(product.id);
   
   const maxPrice = product.priceRange.max;
   const bestPrice = product.bestPrice || maxPrice;
@@ -36,6 +40,14 @@ const ProductCard = ({ product, quantity, onAdd, onRemove, selectedStores }: Pro
   const displayStore = cheapestAvailable?.storeName || product.bestStore || 'N/A';
   const displayStoreRating = cheapestAvailable?.rating || 4.0;
 
+  const handleWishlistToggle = () => {
+    if (inWishlist) {
+      removeFromWishlist(product.id);
+    } else {
+      addToWishlist(product.id, displayPrice);
+    }
+  };
+
   return (
     <div className="group bg-card rounded-xl border border-border/50 overflow-hidden hover:shadow-lg hover:border-primary/30 transition-all duration-300 hover:-translate-y-0.5">
       {/* Image */}
@@ -46,8 +58,22 @@ const ProductCard = ({ product, quantity, onAdd, onRemove, selectedStores }: Pro
             {savingsPercent}% OFF
           </span>
         )}
+        
+        {/* Wishlist Button */}
+        <button
+          onClick={handleWishlistToggle}
+          className={cn(
+            "absolute top-2 right-2 p-2 rounded-full transition-all duration-200 shadow-sm",
+            inWishlist 
+              ? "bg-red-500 text-white hover:bg-red-600" 
+              : "bg-white/90 text-muted-foreground hover:bg-white hover:text-red-500"
+          )}
+        >
+          <Heart className={cn("w-4 h-4", inWishlist && "fill-current")} />
+        </button>
+        
         {quantity > 0 && (
-          <div className="absolute top-2 right-2 bg-primary text-primary-foreground w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shadow-md ring-2 ring-background">
+          <div className="absolute bottom-2 right-2 bg-primary text-primary-foreground w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shadow-md ring-2 ring-background">
             {quantity}
           </div>
         )}
