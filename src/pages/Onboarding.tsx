@@ -146,7 +146,7 @@ const Onboarding = () => {
             <div className="w-10 h-10 rounded-xl gradient-hero flex items-center justify-center">
               <Leaf className="w-6 h-6 text-primary-foreground" />
             </div>
-            <span className="text-2xl font-display font-bold text-foreground">GROCERA</span>
+            <span className="text-2xl font-display font-bold text-foreground">FLASH KART</span>
           </div>
           <h1 className="text-3xl font-display font-bold text-foreground">Set Up Your Household</h1>
           <p className="text-muted-foreground mt-2">Tell us about your family for personalized grocery planning</p>

@@ -124,7 +124,7 @@ const Auth = () => {
               <Leaf className="w-7 h-7 text-primary-foreground" />
             </div>
           </Link>
-          <h1 className="text-3xl font-display font-bold text-foreground">Welcome to GROCERA</h1>
+          <h1 className="text-3xl font-display font-bold text-foreground">Welcome to FLASH KART</h1>
           <p className="text-muted-foreground mt-2">Smart grocery planning for your household</p>
         </div>
 

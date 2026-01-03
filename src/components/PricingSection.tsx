@@ -8,7 +8,7 @@ const PricingSection = () => {
       name: "Basic",
       price: "Free",
       period: "",
-      description: "Perfect for trying out GROCERA",
+      description: "Perfect for trying out Flash Kart",
       features: [
         "Basic grocery list creation",
         "Price comparison (2 stores)",

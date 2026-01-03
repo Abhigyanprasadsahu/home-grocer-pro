@@ -190,7 +190,7 @@ const Dashboard = () => {
               <Leaf className="w-6 h-6 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="text-xl font-display font-bold text-foreground">GROCERA</h1>
+              <h1 className="text-xl font-display font-bold text-foreground">FLASH KART</h1>
               <p className="text-xs text-muted-foreground">{household?.name || 'Dashboard'}</p>
             </div>
           </div>
