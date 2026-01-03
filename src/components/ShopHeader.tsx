@@ -13,9 +13,10 @@ interface ShopHeaderProps {
   onCartClick: () => void;
   searchQuery: string;
   onSearchChange: (query: string) => void;
+  onAddressClick?: () => void;
 }
 
-const ShopHeader = ({ cartCount, onCartClick, searchQuery, onSearchChange }: ShopHeaderProps) => {
+const ShopHeader = ({ cartCount, onCartClick, searchQuery, onSearchChange, onAddressClick }: ShopHeaderProps) => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [location] = useState('Bangalore, 560001');
@@ -44,7 +45,10 @@ const ShopHeader = ({ cartCount, onCartClick, searchQuery, onSearchChange }: Sho
               </span>
             </Link>
 
-            <button className="hidden md:flex items-center gap-2 px-3 py-2 bg-secondary/50 rounded-lg hover:bg-secondary transition-colors border border-border/50">
+            <button 
+              onClick={onAddressClick}
+              className="hidden md:flex items-center gap-2 px-3 py-2 bg-secondary/50 rounded-lg hover:bg-secondary transition-colors border border-border/50"
+            >
               <MapPin className="w-4 h-4 text-primary" />
               <div className="text-left">
                 <p className="text-xs text-muted-foreground">Deliver to</p>

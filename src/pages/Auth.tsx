@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { Leaf, Mail, Lock, User, ArrowRight, Sparkles } from 'lucide-react';
+import { Leaf, Mail, Lock, User, ArrowRight, Sparkles, Home, ArrowLeft } from 'lucide-react';
 import { z } from 'zod';
 
 const emailSchema = z.string().email('Please enter a valid email address');
@@ -107,14 +107,23 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      {/* Back to Home Button */}
+      <Link 
+        to="/" 
+        className="fixed top-4 left-4 flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-xl hover:bg-secondary transition-colors shadow-sm"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        <span className="text-sm font-medium">Back to Shop</span>
+      </Link>
+
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <div className="w-12 h-12 rounded-xl gradient-hero flex items-center justify-center shadow-glow">
+          <Link to="/" className="inline-flex items-center justify-center gap-2 mb-4 group">
+            <div className="w-12 h-12 rounded-xl gradient-hero flex items-center justify-center shadow-glow group-hover:scale-105 transition-transform">
               <Leaf className="w-7 h-7 text-primary-foreground" />
             </div>
-          </div>
+          </Link>
           <h1 className="text-3xl font-display font-bold text-foreground">Welcome to GROCERA</h1>
           <p className="text-muted-foreground mt-2">Smart grocery planning for your household</p>
         </div>
