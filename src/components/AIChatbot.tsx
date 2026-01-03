@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { MessageCircle, X, Send, Sparkles, Loader2, ShoppingCart, Lightbulb, ChefHat, Percent } from 'lucide-react';
+import { MessageCircle, X, Send, Sparkles, Loader2, ShoppingCart, Lightbulb, ChefHat, Percent, RotateCcw, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -46,6 +46,11 @@ const AIChatbot = ({ cart = [] }: AIChatbotProps) => {
       inputRef.current.focus();
     }
   }, [isOpen]);
+
+  const resetChat = () => {
+    setMessages([]);
+    setInput('');
+  };
 
   const streamChat = async (userMessage: string) => {
     const newMessages: Message[] = [...messages, { role: 'user', content: userMessage }];
@@ -174,17 +179,44 @@ const AIChatbot = ({ cart = [] }: AIChatbotProps) => {
                 <p className="text-xs text-white/70">Your smart shopping assistant</p>
               </div>
             </div>
-            <button
-              onClick={() => setIsOpen(false)}
-              className="p-2 hover:bg-white/10 rounded-full transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            <div className="flex items-center gap-1">
+              {messages.length > 0 && (
+                <button
+                  onClick={resetChat}
+                  className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                  title="Start new chat"
+                >
+                  <RotateCcw className="w-5 h-5" />
+                </button>
+              )}
+              <button
+                onClick={() => setIsOpen(false)}
+                className="p-2 hover:bg-white/10 rounded-full transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
           </div>
         </div>
 
+        {/* Back to suggestions button when in conversation */}
+        {messages.length > 0 && (
+          <div className="px-4 py-2 border-b border-border bg-secondary/30">
+            <button
+              onClick={resetChat}
+              className="flex items-center gap-2 text-sm text-primary hover:underline"
+            >
+              <Home className="w-4 h-4" />
+              Back to suggestions
+            </button>
+          </div>
+        )}
+
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4" style={{ height: 'calc(100% - 180px)' }}>
+        <div 
+          className="flex-1 overflow-y-auto p-4 space-y-4" 
+          style={{ height: messages.length > 0 ? 'calc(100% - 210px)' : 'calc(100% - 180px)' }}
+        >
           {messages.length === 0 ? (
             <div className="space-y-4">
               <div className="text-center py-4">

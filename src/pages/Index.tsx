@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Zap, TrendingUp, Percent, Sparkles, RefreshCw, Clock, Gift, Shield, Truck, Users, ShoppingCart, MapPin, BadgeCheck, Timer, Flame, ChefHat } from 'lucide-react';
+import { Zap, TrendingUp, Percent, Sparkles, RefreshCw, Clock, Gift, Shield, Truck, Users, ShoppingCart, MapPin, BadgeCheck, Timer, Flame, ChefHat, Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import ShopHeader from '@/components/ShopHeader';
@@ -11,6 +11,10 @@ import StoreFilter from '@/components/StoreFilter';
 import StoreSummary from '@/components/StoreSummary';
 import AIChatbot from '@/components/AIChatbot';
 import AIRecipeFinder from '@/components/AIRecipeFinder';
+import AIDealFinder from '@/components/AIDealFinder';
+import AIPriceAlerts from '@/components/AIPriceAlerts';
+import SmartCart from '@/components/SmartCart';
+import DeliveryAddressManager from '@/components/DeliveryAddressManager';
 import { useLivePrices, LiveProduct } from '@/hooks/useLivePrices';
 import { useAuth } from '@/hooks/useAuth';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -29,6 +33,10 @@ const Index = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [selectedStores, setSelectedStores] = useState<string[]>([]);
   const [isRecipeFinderOpen, setIsRecipeFinderOpen] = useState(false);
+  const [isDealFinderOpen, setIsDealFinderOpen] = useState(false);
+  const [isPriceAlertsOpen, setIsPriceAlertsOpen] = useState(false);
+  const [isSmartCartOpen, setIsSmartCartOpen] = useState(false);
+  const [isAddressManagerOpen, setIsAddressManagerOpen] = useState(false);
 
   const { products, stores, isLoading, error, lastUpdated, refresh } = useLivePrices({
     category: activeCategory,
@@ -116,6 +124,7 @@ const Index = () => {
           onCartClick={() => setIsCartOpen(true)}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
+          onAddressClick={() => setIsAddressManagerOpen(true)}
         />
 
         <main className="max-w-7xl mx-auto px-4 py-6 space-y-6">
@@ -233,33 +242,42 @@ const Index = () => {
                 <p className="text-xs text-muted-foreground">Smart grocery lists</p>
               </div>
             </button>
-            <div className="flex items-center gap-3 p-4 bg-gradient-to-br from-accent/10 to-accent/5 rounded-xl border border-accent/20 hover:shadow-md transition-all">
-              <div className="p-2.5 rounded-lg bg-accent/20">
-                <TrendingUp className="w-5 h-5 text-accent" />
+            <button
+              onClick={() => setIsPriceAlertsOpen(true)}
+              className="flex items-center gap-3 p-4 bg-gradient-to-br from-accent/10 to-accent/5 rounded-xl border border-accent/20 hover:border-accent/40 hover:shadow-lg transition-all group text-left"
+            >
+              <div className="p-2.5 rounded-lg bg-accent/20 group-hover:bg-accent/30 transition-colors">
+                <Bell className="w-5 h-5 text-accent" />
               </div>
               <div>
                 <p className="font-semibold text-foreground">AI Price Alerts</p>
                 <p className="text-xs text-muted-foreground">Smart notifications</p>
               </div>
-            </div>
-            <div className="flex items-center gap-3 p-4 bg-gradient-to-br from-green-500/10 to-green-500/5 rounded-xl border border-green-500/20 hover:shadow-md transition-all">
-              <div className="p-2.5 rounded-lg bg-green-500/20">
+            </button>
+            <button
+              onClick={() => setIsDealFinderOpen(true)}
+              className="flex items-center gap-3 p-4 bg-gradient-to-br from-green-500/10 to-green-500/5 rounded-xl border border-green-500/20 hover:border-green-500/40 hover:shadow-lg transition-all group text-left"
+            >
+              <div className="p-2.5 rounded-lg bg-green-500/20 group-hover:bg-green-500/30 transition-colors">
                 <Percent className="w-5 h-5 text-green-600" />
               </div>
               <div>
                 <p className="font-semibold text-foreground">AI Deal Finder</p>
                 <p className="text-xs text-muted-foreground">Best prices found</p>
               </div>
-            </div>
-            <div className="flex items-center gap-3 p-4 bg-gradient-to-br from-blue-500/10 to-blue-500/5 rounded-xl border border-blue-500/20 hover:shadow-md transition-all">
-              <div className="p-2.5 rounded-lg bg-blue-500/20">
+            </button>
+            <button
+              onClick={() => setIsSmartCartOpen(true)}
+              className="flex items-center gap-3 p-4 bg-gradient-to-br from-blue-500/10 to-blue-500/5 rounded-xl border border-blue-500/20 hover:border-blue-500/40 hover:shadow-lg transition-all group text-left"
+            >
+              <div className="p-2.5 rounded-lg bg-blue-500/20 group-hover:bg-blue-500/30 transition-colors">
                 <ShoppingCart className="w-5 h-5 text-blue-600" />
               </div>
               <div>
                 <p className="font-semibold text-foreground">Smart Cart</p>
                 <p className="text-xs text-muted-foreground">AI optimized</p>
               </div>
-            </div>
+            </button>
           </div>
 
           {/* Store Summary for Cart */}
@@ -480,6 +498,36 @@ const Index = () => {
           isOpen={isRecipeFinderOpen} 
           onClose={() => setIsRecipeFinderOpen(false)}
           initialIngredients={cartItems.map(item => item.product.name)}
+        />
+
+        {/* AI Deal Finder Modal */}
+        <AIDealFinder 
+          isOpen={isDealFinderOpen} 
+          onClose={() => setIsDealFinderOpen(false)}
+          onAddToCart={(productName) => {
+            // Find product and add to cart
+            const product = products.find(p => p.name.toLowerCase().includes(productName.toLowerCase()));
+            if (product) addToCart(product);
+          }}
+        />
+
+        {/* AI Price Alerts Modal */}
+        <AIPriceAlerts 
+          isOpen={isPriceAlertsOpen} 
+          onClose={() => setIsPriceAlertsOpen(false)}
+        />
+
+        {/* Smart Cart Modal */}
+        <SmartCart 
+          isOpen={isSmartCartOpen} 
+          onClose={() => setIsSmartCartOpen(false)}
+          cartItems={cartItems}
+        />
+
+        {/* Delivery Address Manager Modal */}
+        <DeliveryAddressManager 
+          isOpen={isAddressManagerOpen} 
+          onClose={() => setIsAddressManagerOpen(false)}
         />
       </div>
     </>
