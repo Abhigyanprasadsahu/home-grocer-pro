@@ -7,15 +7,15 @@ const HeroSection = () => {
   const navigate = useNavigate();
 
   const aiFeatures = [
-    { icon: Sparkles, label: "AI-Powered Shopping" },
-    { icon: TrendingDown, label: "Smart Price Tracking" },
-    { icon: Zap, label: "Instant Recommendations" },
+    { icon: Sparkles, label: "AI Monthly Planning" },
+    { icon: TrendingDown, label: "Bulk Discounts" },
+    { icon: Users, label: "Family Optimized" },
   ];
 
   const features = [
-    { icon: Zap, text: "Lightning fast delivery" },
-    { icon: Star, text: "Best prices guaranteed" },
-    { icon: ShieldCheck, text: "Fresh & quality assured" },
+    { icon: Truck, text: "Van delivery for bulk orders" },
+    { icon: Star, text: "Up to 40% on monthly groceries" },
+    { icon: ShieldCheck, text: "Multi-store price comparison" },
   ];
 
   return (
@@ -33,19 +33,19 @@ const HeroSection = () => {
           {/* Content */}
           <div className="space-y-8 animate-fade-in">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary font-medium text-sm border border-primary/20">
-              <Sparkles className="w-4 h-4" />
-              <span>AI-Powered Smart Shopping</span>
+              <Truck className="w-4 h-4" />
+              <span>India's #1 Bulk Grocery Platform</span>
             </div>
 
             <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-[1.1] tracking-tight">
-              Shop Smarter,{" "}
-              <span className="text-gradient">Save Bigger</span>{" "}
-              with Flash Kart
+              Order Monthly,{" "}
+              <span className="text-gradient">Save Big</span>{" "}
+              with GROCERA
             </h1>
 
             <p className="text-lg sm:text-xl text-muted-foreground max-w-lg leading-relaxed">
-              Compare prices across 12+ stores, get AI-powered recommendations, 
-              and save up to 30% on your monthly groceries. Fast, fresh, and affordable.
+              Plan your entire month's groceries with AI. Get bulk discounts from local Kirana partners, 
+              compare prices across 12+ stores, and save up to 40% on family groceries.
             </p>
 
             {/* Quick Features */}
@@ -59,12 +59,12 @@ const HeroSection = () => {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button variant="hero" size="lg" className="group" onClick={() => navigate('/shop')}>
-                Start Shopping
+              <Button variant="hero" size="lg" className="group" onClick={() => navigate('/onboarding')}>
+                Plan Your Monthly Groceries
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Button>
-              <Button variant="outline" size="lg" onClick={() => navigate('/auth')}>
-                Sign In to Save Lists
+              <Button variant="outline" size="lg" onClick={() => navigate('/shop')}>
+                Browse & Compare Prices
               </Button>
             </div>
 
@@ -94,11 +94,11 @@ const HeroSection = () => {
             <div className="absolute -bottom-6 -left-6 bg-card rounded-2xl p-4 shadow-soft animate-float border border-border">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-full gradient-hero flex items-center justify-center">
-                  <TrendingDown className="w-6 h-6 text-primary-foreground" />
+                  <Truck className="w-6 h-6 text-primary-foreground" />
                 </div>
                 <div>
-                  <div className="font-semibold text-foreground">Save ₹2,500</div>
-                  <div className="text-xs text-muted-foreground">This month</div>
+                  <div className="font-semibold text-foreground">Bulk Delivery</div>
+                  <div className="text-xs text-muted-foreground">Van service available</div>
                 </div>
               </div>
             </div>
@@ -106,17 +106,17 @@ const HeroSection = () => {
             <div className="absolute -top-4 -right-4 bg-card rounded-2xl p-4 shadow-soft animate-float border border-border" style={{ animationDelay: "1s" }}>
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-full gradient-accent flex items-center justify-center">
-                  <Zap className="w-6 h-6 text-accent-foreground" />
+                  <Users className="w-6 h-6 text-accent-foreground" />
                 </div>
                 <div>
-                  <div className="font-semibold text-foreground">Flash Deals</div>
-                  <div className="text-xs text-muted-foreground">Live now!</div>
+                  <div className="font-semibold text-foreground">Family Plans</div>
+                  <div className="text-xs text-muted-foreground">AI optimized</div>
                 </div>
               </div>
             </div>
 
             <div className="absolute top-1/2 -right-8 bg-primary text-primary-foreground rounded-full px-4 py-2 shadow-glow animate-bounce-subtle">
-              <span className="text-sm font-bold">Up to 30% OFF</span>
+              <span className="text-sm font-bold">Up to 40% OFF on Bulk</span>
             </div>
           </div>
         </div>

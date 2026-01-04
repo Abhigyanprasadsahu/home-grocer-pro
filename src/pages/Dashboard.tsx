@@ -10,13 +10,18 @@ import {
   Plus, Sparkles, ChevronRight, Edit3, Trash2, Check, Home
 } from 'lucide-react';
 import AIGroceryPlanner from '@/components/AIGroceryPlanner';
+import AddItemModal from '@/components/AddItemModal';
+import EditHouseholdModal from '@/components/EditHouseholdModal';
+import type { Database } from '@/integrations/supabase/types';
+
+type DietPreference = Database['public']['Enums']['diet_preference'];
 
 interface Household {
   id: string;
   name: string;
   family_size: number;
   monthly_budget: number;
-  diet_preferences: string[];
+  diet_preferences: DietPreference[] | null;
 }
 
 interface GroceryList {
@@ -49,6 +54,8 @@ const Dashboard = () => {
   const [activeList, setActiveList] = useState<GroceryList | null>(null);
   const [groceryItems, setGroceryItems] = useState<GroceryItem[]>([]);
   const [showPlanner, setShowPlanner] = useState(false);
+  const [showAddItem, setShowAddItem] = useState(false);
+  const [showEditHousehold, setShowEditHousehold] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -190,7 +197,7 @@ const Dashboard = () => {
               <Leaf className="w-6 h-6 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="text-xl font-display font-bold text-foreground">FLASH KART</h1>
+              <h1 className="text-xl font-display font-bold text-foreground">GROCERA</h1>
               <p className="text-xs text-muted-foreground">{household?.name || 'Dashboard'}</p>
             </div>
           </div>
@@ -373,12 +380,12 @@ const Dashboard = () => {
                   Generate New Plan
                   <ChevronRight className="w-4 h-4 ml-auto" />
                 </Button>
-                <Button variant="outline" className="w-full justify-start">
+                <Button variant="outline" className="w-full justify-start" onClick={() => setShowAddItem(true)} disabled={!activeList}>
                   <Plus className="w-4 h-4 mr-2" />
                   Add Item Manually
                   <ChevronRight className="w-4 h-4 ml-auto" />
                 </Button>
-                <Button variant="outline" className="w-full justify-start">
+                <Button variant="outline" className="w-full justify-start" onClick={() => setShowEditHousehold(true)}>
                   <Edit3 className="w-4 h-4 mr-2" />
                   Edit Household
                   <ChevronRight className="w-4 h-4 ml-auto" />
@@ -419,6 +426,26 @@ const Dashboard = () => {
           household={household}
           onClose={() => setShowPlanner(false)}
           onPlanGenerated={handlePlanGenerated}
+        />
+      )}
+
+      {/* Add Item Modal */}
+      {showAddItem && activeList && (
+        <AddItemModal
+          listId={activeList.id}
+          onClose={() => setShowAddItem(false)}
+          onItemAdded={() => {
+            fetchItems(activeList.id);
+          }}
+        />
+      )}
+
+      {/* Edit Household Modal */}
+      {showEditHousehold && household && (
+        <EditHouseholdModal
+          household={household}
+          onClose={() => setShowEditHousehold(false)}
+          onUpdated={fetchData}
         />
       )}
     </div>

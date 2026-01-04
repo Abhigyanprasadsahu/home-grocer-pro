@@ -74,10 +74,10 @@ const FeaturesSection = () => {
           <span className="text-primary font-semibold text-sm uppercase tracking-wider">Features</span>
           <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold mt-4 mb-6">
             Everything You Need for{" "}
-            <span className="text-gradient">Smarter Shopping</span>
+            <span className="text-gradient">Smart Bulk Shopping</span>
           </h2>
           <p className="text-lg text-muted-foreground">
-            From AI planning to bulk delivery, Flash Kart transforms how you manage household groceries.
+            From AI planning to van delivery, GROCERA transforms how you manage monthly household groceries.
           </p>
         </div>
 
