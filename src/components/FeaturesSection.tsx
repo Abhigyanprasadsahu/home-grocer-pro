@@ -77,7 +77,7 @@ const FeaturesSection = () => {
             <span className="text-gradient">Smart Bulk Shopping</span>
           </h2>
           <p className="text-lg text-muted-foreground">
-            From AI planning to van delivery, GROCERA transforms how you manage monthly household groceries.
+            From AI planning to van delivery, Flash Cart transforms how you manage monthly household groceries.
           </p>
         </div>
 

@@ -18,7 +18,7 @@ const Footer = () => {
               <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
                 <ShoppingBasket className="w-5 h-5 text-primary-foreground" />
               </div>
-              <span className="font-display text-2xl font-bold">FLASH KART</span>
+              <span className="font-display text-2xl font-bold">Flash Cart</span>
             </a>
             <p className="text-background/70 mb-6 leading-relaxed">
               India's smartest bulk and monthly grocery planning platform. 
@@ -63,7 +63,7 @@ const Footer = () => {
         {/* Bottom */}
         <div className="pt-8 border-t border-background/10 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-background/60">
-            © {new Date().getFullYear()} FLASH KART. All rights reserved.
+            © {new Date().getFullYear()} Flash Cart. All rights reserved.
           </p>
           <p className="text-sm text-background/60">
             Made with 💚 for smarter Indian households

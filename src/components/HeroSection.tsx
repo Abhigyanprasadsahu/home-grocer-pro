@@ -40,7 +40,7 @@ const HeroSection = () => {
             <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-[1.1] tracking-tight">
               Order Monthly,{" "}
               <span className="text-gradient">Save Big</span>{" "}
-              with GROCERA
+              with Flash Cart
             </h1>
 
             <p className="text-lg sm:text-xl text-muted-foreground max-w-lg leading-relaxed">

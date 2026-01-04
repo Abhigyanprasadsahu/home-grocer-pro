@@ -116,7 +116,7 @@ const Index = () => {
   return (
     <>
       <Helmet>
-        <title>Flash Kart - Compare Prices Across 12+ Stores</title>
+        <title>Flash Cart - Compare Prices Across 12+ Stores</title>
         <meta name="description" content="Compare grocery prices across D-Mart, BigBasket, Zepto and more. Find the best deals and save up to 30% on your groceries." />
       </Helmet>
 
@@ -447,7 +447,7 @@ const Index = () => {
               <div>
                 <div className="flex items-center gap-2 mb-3">
                   <Zap className="w-5 h-5 text-primary" />
-                  <span className="font-display font-bold text-lg text-foreground">Flash Kart</span>
+                  <span className="font-display font-bold text-lg text-foreground">Flash Cart</span>
                 </div>
                 <p className="text-sm text-muted-foreground">India's smartest grocery price comparison platform. Save money on every purchase.</p>
               </div>
@@ -477,7 +477,7 @@ const Index = () => {
               </div>
             </div>
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-border text-sm text-muted-foreground">
-              <span>© 2026 Flash Kart. All rights reserved.</span>
+              <span>© 2026 Flash Cart. All rights reserved.</span>
               <span className="flex items-center gap-1">Made with 🧡 in India</span>
             </div>
           </div>
