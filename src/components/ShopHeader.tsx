@@ -41,7 +41,7 @@ const ShopHeader = ({ cartCount, onCartClick, searchQuery, onSearchChange, onAdd
                 <Zap className="w-6 h-6 text-primary-foreground" />
               </div>
               <span className="text-xl font-display font-bold text-gradient hidden sm:block">
-                Flash Kart
+                Flash Cart
               </span>
             </Link>
 

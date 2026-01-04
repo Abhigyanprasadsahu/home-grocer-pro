@@ -25,7 +25,7 @@ const Navbar = () => {
             <div className="w-10 h-10 rounded-xl gradient-hero flex items-center justify-center shadow-glow group-hover:scale-105 transition-transform">
               <ShoppingCart className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="font-display text-2xl font-bold text-gradient">GROCERA</span>
+            <span className="font-display text-2xl font-bold text-gradient">Flash Cart</span>
           </a>
 
           {/* Desktop Navigation */}

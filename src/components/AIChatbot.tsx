@@ -175,7 +175,7 @@ const AIChatbot = ({ cart = [] }: AIChatbotProps) => {
                 <Sparkles className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="font-display font-bold">Flash Kart AI</h3>
+                <h3 className="font-display font-bold">Flash Cart AI</h3>
                 <p className="text-xs text-white/70">Your smart shopping assistant</p>
               </div>
             </div>
