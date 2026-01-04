@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Zap, User } from "lucide-react";
+import { Menu, X, ShoppingCart, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -23,9 +23,9 @@ const Navbar = () => {
           {/* Logo */}
           <a href="/" className="flex items-center gap-2 group">
             <div className="w-10 h-10 rounded-xl gradient-hero flex items-center justify-center shadow-glow group-hover:scale-105 transition-transform">
-              <Zap className="w-5 h-5 text-primary-foreground" />
+              <ShoppingCart className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="font-display text-2xl font-bold text-gradient">Flash Kart</span>
+            <span className="font-display text-2xl font-bold text-gradient">GROCERA</span>
           </a>
 
           {/* Desktop Navigation */}
