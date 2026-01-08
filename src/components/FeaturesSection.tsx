@@ -7,57 +7,61 @@ import {
   RefreshCw, 
   Shield,
   Store,
-  Salad
+  Salad,
+  Video,
+  Bell,
+  MessageSquare,
+  Package
 } from "lucide-react";
 
 const FeaturesSection = () => {
   const features = [
     {
       icon: Brain,
-      title: "AI-Powered Planning",
-      description: "Tell us your family size, dietary needs, and budget. Our AI creates optimized monthly grocery lists instantly.",
+      title: "AI Recipe Planner",
+      description: "Plan monthly groceries based on protein, carbs, vitamins & nutrients. Get personalized nutrition-balanced lists.",
       gradient: "from-primary to-primary/60",
+    },
+    {
+      icon: Video,
+      title: "Recipe Video Maker",
+      description: "Generate 20-second cooking videos for Gen-Z. Quick tutorials from ingredients you ordered.",
+      gradient: "from-pink-500 to-purple-500",
+    },
+    {
+      icon: RefreshCw,
+      title: "Auto-Ordering",
+      description: "Set up recurring orders for daily essentials like milk, bread, vegetables. Never run out!",
+      gradient: "from-blue-500 to-cyan-500",
     },
     {
       icon: BarChart3,
       title: "Price Comparison",
-      description: "Compare prices across D-Mart, Reliance, Big Bazaar, and more. Always get the best deals.",
+      description: "Compare prices across D-Mart, Big Basket, Big Bazaar and 12+ local Kirana stores instantly.",
       gradient: "from-accent to-accent/60",
     },
     {
-      icon: Users,
-      title: "Family Profiles",
-      description: "Create profiles for children, adults, and elderly members. Get nutrition-balanced recommendations.",
-      gradient: "from-primary to-accent",
-    },
-    {
-      icon: Salad,
-      title: "Diet Customization",
-      description: "Vegetarian, high-protein, diabetic-friendly, or fitness-focused. We adapt to your lifestyle.",
-      gradient: "from-primary/80 to-primary",
-    },
-    {
-      icon: RefreshCw,
-      title: "Auto-Repeat Orders",
-      description: "Set up recurring monthly orders. We learn your patterns and optimize automatically.",
-      gradient: "from-accent/80 to-accent",
+      icon: Bell,
+      title: "AI Price Alerts",
+      description: "Get notified when products near expiry go on discount. Smart alerts from local Kirana stores.",
+      gradient: "from-red-500 to-rose-500",
     },
     {
       icon: Truck,
-      title: "Bulk Delivery",
-      description: "Van-based delivery for large orders. Or pick up from partner stores at your convenience.",
+      title: "Two-Tier Delivery",
+      description: "Bulk orders (₹2500+) get free van delivery. Small orders via quick bike delivery.",
       gradient: "from-primary to-primary/60",
     },
     {
       icon: Store,
-      title: "Multi-Store Sourcing",
-      description: "One cart, multiple stores. We source from wherever gives you the best price and availability.",
+      title: "Kirana Partnership",
+      description: "We partner with local Kirana stores - no inventory needed. Fresher products, supporting local business.",
       gradient: "from-accent to-primary",
     },
     {
-      icon: Shield,
+      icon: Users,
       title: "Community Orders",
-      description: "Apartment societies and hostels can combine orders for extra savings on bulk purchases.",
+      description: "Apartments, PGs, hostels can combine orders for extra bulk savings. Group buying power!",
       gradient: "from-primary/60 to-accent/60",
     },
   ];
@@ -71,9 +75,9 @@ const FeaturesSection = () => {
 
       <div className="container mx-auto px-4">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="text-primary font-semibold text-sm uppercase tracking-wider">Features</span>
+          <span className="text-primary font-semibold text-sm uppercase tracking-wider">Platform Features</span>
           <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold mt-4 mb-6">
-            Everything You Need for{" "}
+            Everything for{" "}
             <span className="text-gradient">Smart Bulk Shopping</span>
           </h2>
           <p className="text-lg text-muted-foreground">

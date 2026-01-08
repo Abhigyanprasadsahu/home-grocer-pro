@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles, TrendingDown, Users, Truck, Zap, Star, ShieldCheck } from "lucide-react";
+import { ArrowRight, Sparkles, TrendingDown, Users, Truck, Zap, Star, ShieldCheck, Bike, Building, Package } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import heroImage from "@/assets/hero-groceries.jpg";
 
@@ -7,15 +7,21 @@ const HeroSection = () => {
   const navigate = useNavigate();
 
   const aiFeatures = [
-    { icon: Sparkles, label: "AI Monthly Planning" },
-    { icon: TrendingDown, label: "Bulk Discounts" },
+    { icon: Sparkles, label: "AI Meal Planning" },
+    { icon: TrendingDown, label: "Up to 40% Savings" },
     { icon: Users, label: "Family Optimized" },
   ];
 
   const features = [
-    { icon: Truck, text: "Van delivery for bulk orders" },
-    { icon: Star, text: "Up to 40% on monthly groceries" },
-    { icon: ShieldCheck, text: "Multi-store price comparison" },
+    { icon: Truck, text: "Free van delivery on ₹2500+" },
+    { icon: Bike, text: "Quick bike delivery for daily needs" },
+    { icon: Building, text: "Community bulk discounts" },
+  ];
+
+  const stats = [
+    { value: "12+", label: "Partner Stores" },
+    { value: "40%", label: "Max Savings" },
+    { value: "10K+", label: "Happy Families" },
   ];
 
   return (
@@ -33,19 +39,19 @@ const HeroSection = () => {
           {/* Content */}
           <div className="space-y-8 animate-fade-in">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary font-medium text-sm border border-primary/20">
-              <Truck className="w-4 h-4" />
+              <Package className="w-4 h-4" />
               <span>India's #1 Bulk Grocery Platform</span>
             </div>
 
             <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-[1.1] tracking-tight">
-              Order Monthly,{" "}
+              Bulk Order,{" "}
               <span className="text-gradient">Save Big</span>{" "}
               with Flash Cart
             </h1>
 
             <p className="text-lg sm:text-xl text-muted-foreground max-w-lg leading-relaxed">
-              Plan your entire month's groceries with AI. Get bulk discounts from local Kirana partners, 
-              compare prices across 12+ stores, and save up to 40% on family groceries.
+              AI-powered monthly grocery planning. Compare prices from D-Mart, Big Basket & local Kirana stores. 
+              Free van delivery on bulk orders ₹2500+.
             </p>
 
             {/* Quick Features */}
@@ -60,7 +66,7 @@ const HeroSection = () => {
 
             <div className="flex flex-col sm:flex-row gap-4">
               <Button variant="hero" size="lg" className="group" onClick={() => navigate('/onboarding')}>
-                Plan Your Monthly Groceries
+                Plan Monthly Groceries
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Button>
               <Button variant="outline" size="lg" onClick={() => navigate('/shop')}>
@@ -68,8 +74,18 @@ const HeroSection = () => {
               </Button>
             </div>
 
+            {/* Stats */}
+            <div className="flex gap-8 pt-8 border-t border-border">
+              {stats.map((stat) => (
+                <div key={stat.label}>
+                  <p className="font-display text-3xl font-bold text-primary">{stat.value}</p>
+                  <p className="text-sm text-muted-foreground">{stat.label}</p>
+                </div>
+              ))}
+            </div>
+
             {/* AI Features */}
-            <div className="flex flex-wrap gap-4 pt-8 border-t border-border">
+            <div className="flex flex-wrap gap-4">
               {aiFeatures.map((feature) => (
                 <div key={feature.label} className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
                   <feature.icon className="w-4 h-4 text-primary" />
@@ -98,7 +114,7 @@ const HeroSection = () => {
                 </div>
                 <div>
                   <div className="font-semibold text-foreground">Bulk Delivery</div>
-                  <div className="text-xs text-muted-foreground">Van service available</div>
+                  <div className="text-xs text-muted-foreground">Free on ₹2500+</div>
                 </div>
               </div>
             </div>
@@ -106,17 +122,23 @@ const HeroSection = () => {
             <div className="absolute -top-4 -right-4 bg-card rounded-2xl p-4 shadow-soft animate-float border border-border" style={{ animationDelay: "1s" }}>
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-full gradient-accent flex items-center justify-center">
-                  <Users className="w-6 h-6 text-accent-foreground" />
+                  <Sparkles className="w-6 h-6 text-accent-foreground" />
                 </div>
                 <div>
-                  <div className="font-semibold text-foreground">Family Plans</div>
-                  <div className="text-xs text-muted-foreground">AI optimized</div>
+                  <div className="font-semibold text-foreground">AI Planning</div>
+                  <div className="text-xs text-muted-foreground">Smart grocery lists</div>
                 </div>
               </div>
             </div>
 
             <div className="absolute top-1/2 -right-8 bg-primary text-primary-foreground rounded-full px-4 py-2 shadow-glow animate-bounce-subtle">
-              <span className="text-sm font-bold">Up to 40% OFF on Bulk</span>
+              <span className="text-sm font-bold">Save up to 40%</span>
+            </div>
+
+            <div className="absolute bottom-1/4 -left-4 bg-green-500 text-white rounded-full px-3 py-1.5 shadow-lg animate-bounce-subtle" style={{ animationDelay: "0.5s" }}>
+              <span className="text-xs font-bold flex items-center gap-1">
+                <Bike className="w-3 h-3" /> Quick Delivery
+              </span>
             </div>
           </div>
         </div>

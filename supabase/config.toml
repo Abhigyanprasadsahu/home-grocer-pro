@@ -20,3 +20,6 @@ verify_jwt = false
 
 [functions.ai-smart-search]
 verify_jwt = false
+
+[functions.ai-recipe-video]
+verify_jwt = false
