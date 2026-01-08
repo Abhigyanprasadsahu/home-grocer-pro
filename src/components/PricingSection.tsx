@@ -1,21 +1,24 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Check, Star } from "lucide-react";
+import { Check, Star, Percent } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const PricingSection = () => {
+  const navigate = useNavigate();
+  
   const plans = [
     {
       name: "Basic",
       price: "Free",
       period: "",
-      description: "Perfect for trying out Flash Cart",
+      description: "Perfect for trying Flash Cart",
       features: [
         "Basic grocery list creation",
-        "Price comparison (2 stores)",
-        "Standard delivery",
-        "Email support",
+        "Price comparison (3 stores)",
+        "Standard delivery (₹30 fee)",
+        "Community support",
       ],
-      cta: "Get Started",
+      cta: "Get Started Free",
       variant: "outline" as const,
       popular: false,
     },
@@ -26,11 +29,12 @@ const PricingSection = () => {
       description: "Best for regular families",
       features: [
         "AI-powered grocery planning",
-        "Price comparison (all stores)",
-        "Family profiles & diet plans",
-        "Auto-repeat orders",
-        "Priority delivery",
-        "Chat support",
+        "Price comparison (all 12+ stores)",
+        "Auto-ordering subscriptions",
+        "Recipe video generator",
+        "Free delivery on ₹2500+",
+        "Priority support",
+        "Price drop alerts",
       ],
       cta: "Start Free Trial",
       variant: "hero" as const,
@@ -43,11 +47,12 @@ const PricingSection = () => {
       description: "For apartments, hostels & PGs",
       features: [
         "Everything in Family",
-        "Bulk order discounts",
+        "Bulk order discounts (extra 10%)",
         "Combined community orders",
         "Dedicated account manager",
-        "API access",
         "Custom delivery schedule",
+        "API access",
+        "Priority van delivery",
       ],
       cta: "Contact Sales",
       variant: "outline" as const,
@@ -69,7 +74,7 @@ const PricingSection = () => {
             <span className="text-gradient">Fit Your Needs</span>
           </h2>
           <p className="text-lg text-muted-foreground">
-            Start free, upgrade when you're ready. Cancel anytime.
+            Start free, upgrade when you're ready. Cancel anytime. We earn 1-2% commission from Kirana partners.
           </p>
         </div>
 
@@ -110,12 +115,29 @@ const PricingSection = () => {
               </CardContent>
 
               <CardFooter>
-                <Button variant={plan.variant} className="w-full" size="lg">
+                <Button 
+                  variant={plan.variant} 
+                  className="w-full" 
+                  size="lg"
+                  onClick={() => navigate('/onboarding')}
+                >
                   {plan.cta}
                 </Button>
               </CardFooter>
             </Card>
           ))}
+        </div>
+
+        {/* Commission Note */}
+        <div className="max-w-2xl mx-auto mt-12 p-4 bg-secondary/50 rounded-xl text-center">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <Percent className="w-5 h-5 text-primary" />
+            <span className="font-semibold">Transparent Business Model</span>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            We earn 1-2% commission from our Kirana partner stores. No hidden fees, no markups on products. 
+            You always get the actual store price!
+          </p>
         </div>
       </div>
     </section>

@@ -14,6 +14,59 @@ export type Database = {
   }
   public: {
     Tables: {
+      auto_subscriptions: {
+        Row: {
+          created_at: string
+          frequency: string
+          id: string
+          is_active: boolean | null
+          last_delivered: string | null
+          next_delivery: string | null
+          preferred_time: string | null
+          product_id: string | null
+          product_name: string
+          quantity: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          frequency: string
+          id?: string
+          is_active?: boolean | null
+          last_delivered?: string | null
+          next_delivery?: string | null
+          preferred_time?: string | null
+          product_id?: string | null
+          product_name: string
+          quantity?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          frequency?: string
+          id?: string
+          is_active?: boolean | null
+          last_delivered?: string | null
+          next_delivery?: string | null
+          preferred_time?: string | null
+          product_id?: string | null
+          product_name?: string
+          quantity?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "auto_subscriptions_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       grocery_items: {
         Row: {
           best_price: number | null
