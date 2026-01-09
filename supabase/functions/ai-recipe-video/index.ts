@@ -125,14 +125,13 @@ Make it viral-worthy and satisfying to watch!`;
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            model: "google/gemini-2.5-flash-image",
+            model: "google/gemini-3-pro-image-preview",
             messages: [
               {
                 role: "user",
                 content: `Food photography style: ${parsed.generatedImage || `A beautiful, appetizing hero shot of ${recipe.name}, Indian cuisine, professional food photography, warm lighting, garnished, on a traditional plate`}`,
               },
             ],
-            modalities: ["image", "text"],
           }),
         });
 
