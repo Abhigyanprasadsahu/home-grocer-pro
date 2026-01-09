@@ -16,6 +16,15 @@ interface VideoRequest {
   };
 }
 
+interface Scene {
+  timestamp: string;
+  duration: number;
+  visual: string;
+  text: string;
+  voiceover: string;
+  imagePrompt: string;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -29,53 +38,51 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    // Generate a video script optimized for Gen-Z audience
-    const systemPrompt = `You are a creative food content creator making 20-second recipe videos for Gen-Z audience on social media.
+    console.log("Generating video script for:", recipe.name);
 
-Create a video script with:
-1. HOOK (0-3 sec): Catchy one-liner or visual hook
-2. QUICK INGREDIENTS (3-8 sec): Fast visual of ingredients
-3. COOKING MONTAGE (8-18 sec): Quick cuts showing key steps
-4. REVEAL (18-20 sec): Final dish with call-to-action
+    // Generate a video script with image prompts for each scene
+    const systemPrompt = `You are a creative food content creator making 20-second recipe videos for Gen-Z audience.
 
-OUTPUT FORMAT (JSON):
+Create a 4-scene video breakdown with specific image prompts for each scene.
+
+OUTPUT FORMAT (JSON only, no markdown):
 {
   "title": "Catchy video title with emoji",
-  "hook": "Opening hook text/voiceover",
+  "hook": "Opening hook text",
   "scenes": [
     {
-      "timestamp": "0:00-0:03",
-      "visual": "Description of what's on screen",
-      "text": "On-screen text",
+      "timestamp": "0:00-0:05",
+      "duration": 5,
+      "visual": "Description of scene",
+      "text": "On-screen text overlay",
       "voiceover": "What narrator says",
-      "music": "Beat description"
+      "imagePrompt": "Detailed prompt for generating this scene image - be very specific about colors, composition, lighting, style"
     }
   ],
-  "thumbnail": "Description of ideal thumbnail",
-  "hashtags": ["#recipe", "#foodie", "#cooking"],
-  "generatedImage": "A detailed prompt to generate a beautiful hero image of the final dish"
+  "hashtags": ["#recipe", "#foodie"],
+  "musicStyle": "upbeat lo-fi beats"
 }
 
-STYLE GUIDELINES:
-- Use trendy Gen-Z language and emojis
-- Fast-paced, attention-grabbing
-- Make it ASMR-friendly with good sounds
-- Include trending audio cues
-- Focus on visual satisfaction`;
+SCENE BREAKDOWN:
+1. Hook Scene (0-5s): Catchy opening with the final dish teaser
+2. Ingredients Scene (5-10s): All ingredients laid out beautifully
+3. Cooking Scene (10-15s): Key cooking moment action shot
+4. Reveal Scene (15-20s): Final plated dish beauty shot
 
-    const userPrompt = `Create a 20-second recipe video script for:
+IMAGE PROMPT GUIDELINES:
+- Food photography style, warm lighting
+- Vibrant colors, appetizing presentation
+- Professional quality, Instagram-worthy
+- Include specific details about plating and garnish`;
+
+    const userPrompt = `Create a 20-second recipe video for:
 
 Recipe: ${recipe.name}
 Cuisine: ${recipe.cuisine}
-Total Time: ${recipe.prepTime + recipe.cookTime} minutes
+Ingredients: ${recipe.ingredients.join(', ')}
+Steps: ${recipe.steps.join('. ')}
 
-Ingredients:
-${recipe.ingredients.join('\n')}
-
-Steps:
-${recipe.steps.map((s, i) => `${i + 1}. ${s}`).join('\n')}
-
-Make it viral-worthy and satisfying to watch!`;
+Make each scene visually stunning and viral-worthy!`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -93,67 +100,82 @@ Make it viral-worthy and satisfying to watch!`;
     });
 
     if (!response.ok) {
-      if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Too many requests. Please try again." }), {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "Service temporarily unavailable." }), {
-          status: 402,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      throw new Error("AI service error");
+      console.error("Script generation failed:", response.status);
+      throw new Error("Failed to generate video script");
     }
 
     const data = await response.json();
     const content = data.choices?.[0]?.message?.content || "";
     
+    console.log("Script generated, parsing...");
+
     // Parse JSON from response
     const jsonMatch = content.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      const parsed = JSON.parse(jsonMatch[0]);
-      
-      // Generate the hero image for the video thumbnail
-      try {
-        const imageResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${LOVABLE_API_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            model: "google/gemini-2.5-flash-image-preview",
-            messages: [
-              {
-                role: "user",
-                content: `Food photography style: ${parsed.generatedImage || `A beautiful, appetizing hero shot of ${recipe.name}, Indian cuisine, professional food photography, warm lighting, garnished, on a traditional plate`}`,
-              },
-            ],
-            modalities: ["image", "text"],
-          }),
-        });
+    if (!jsonMatch) {
+      throw new Error("Failed to parse video script");
+    }
 
-        if (imageResponse.ok) {
-          const imageData = await imageResponse.json();
-          const generatedImageUrl = imageData.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-          if (generatedImageUrl) {
-            parsed.thumbnailImage = generatedImageUrl;
+    const parsed = JSON.parse(jsonMatch[0]);
+    console.log("Generating images for", parsed.scenes?.length || 0, "scenes");
+
+    // Generate images for each scene in parallel
+    const sceneImages: string[] = [];
+    
+    if (parsed.scenes && Array.isArray(parsed.scenes)) {
+      const imagePromises = parsed.scenes.map(async (scene: Scene, idx: number) => {
+        try {
+          console.log(`Generating image for scene ${idx + 1}:`, scene.imagePrompt?.substring(0, 50));
+          
+          const imageResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${LOVABLE_API_KEY}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              model: "google/gemini-2.5-flash-image-preview",
+              messages: [
+                {
+                  role: "user",
+                  content: scene.imagePrompt || `Professional food photography of ${recipe.name}, ${scene.visual}, warm lighting, appetizing, Instagram-worthy`,
+                },
+              ],
+              modalities: ["image", "text"],
+            }),
+          });
+
+          if (imageResponse.ok) {
+            const imageData = await imageResponse.json();
+            const imageUrl = imageData.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+            console.log(`Scene ${idx + 1} image generated:`, imageUrl ? "success" : "no image");
+            return { idx, url: imageUrl || null };
           }
+          console.error(`Scene ${idx + 1} image failed:`, imageResponse.status);
+          return { idx, url: null };
+        } catch (err) {
+          console.error(`Scene ${idx + 1} image error:`, err);
+          return { idx, url: null };
         }
-      } catch (imgError) {
-        console.error("Image generation failed:", imgError);
-      }
+      });
 
-      return new Response(JSON.stringify(parsed), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      const results = await Promise.all(imagePromises);
+      results.sort((a, b) => a.idx - b.idx);
+      
+      // Add images to scenes
+      results.forEach(({ idx, url }) => {
+        if (parsed.scenes[idx]) {
+          parsed.scenes[idx].image = url;
+        }
       });
     }
 
-    return new Response(JSON.stringify({ error: "Failed to generate video script" }), {
-      status: 500,
+    console.log("Video generation complete");
+
+    return new Response(JSON.stringify({
+      ...parsed,
+      totalDuration: 20,
+      frameRate: "5fps equivalent",
+    }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
