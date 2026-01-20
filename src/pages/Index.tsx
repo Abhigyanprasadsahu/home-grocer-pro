@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Zap, TrendingUp, Percent, Sparkles, RefreshCw, Clock, Gift, Shield, Truck, Users, ShoppingCart, MapPin, BadgeCheck, Timer, Flame, ChefHat, Bell, Heart } from 'lucide-react';
+import { Zap, TrendingUp, Percent, Sparkles, RefreshCw, Clock, Gift, Shield, Truck, Users, ShoppingCart, MapPin, BadgeCheck, Timer, Flame, ChefHat, Bell, Heart, Video } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import ShopHeader from '@/components/ShopHeader';
@@ -11,6 +11,7 @@ import StoreFilter from '@/components/StoreFilter';
 import StoreSummary from '@/components/StoreSummary';
 import AIChatbot from '@/components/AIChatbot';
 import AIRecipeFinder from '@/components/AIRecipeFinder';
+import AIRecipeVideo from '@/components/AIRecipeVideo';
 import AIDealFinder from '@/components/AIDealFinder';
 import AIPriceAlerts from '@/components/AIPriceAlerts';
 import SmartCart from '@/components/SmartCart';
@@ -39,6 +40,7 @@ const Index = () => {
   const [isSmartCartOpen, setIsSmartCartOpen] = useState(false);
   const [isAddressManagerOpen, setIsAddressManagerOpen] = useState(false);
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
+  const [isRecipeVideoOpen, setIsRecipeVideoOpen] = useState(false);
 
   const { products, stores, isLoading, error, lastUpdated, refresh } = useLivePrices({
     category: activeCategory,
@@ -231,7 +233,7 @@ const Index = () => {
           />
 
           {/* AI-Powered Quick Action Cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-6 gap-4">
             <button
               onClick={() => navigate(user ? '/dashboard' : '/auth')}
               className="flex items-center gap-3 p-4 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl border border-primary/20 hover:border-primary/40 hover:shadow-lg transition-all group text-left"
@@ -290,6 +292,18 @@ const Index = () => {
               <div>
                 <p className="font-semibold text-foreground">My Wishlist</p>
                 <p className="text-xs text-muted-foreground">Price alerts</p>
+              </div>
+            </button>
+            <button
+              onClick={() => setIsRecipeVideoOpen(true)}
+              className="flex items-center gap-3 p-4 bg-gradient-to-br from-pink-500/10 to-purple-500/5 rounded-xl border border-pink-500/20 hover:border-pink-500/40 hover:shadow-lg transition-all group text-left"
+            >
+              <div className="p-2.5 rounded-lg bg-pink-500/20 group-hover:bg-pink-500/30 transition-colors">
+                <Video className="w-5 h-5 text-pink-500" />
+              </div>
+              <div>
+                <p className="font-semibold text-foreground">Recipe Video</p>
+                <p className="text-xs text-muted-foreground">AI video maker</p>
               </div>
             </button>
           </div>
@@ -550,6 +564,20 @@ const Index = () => {
           isOpen={isWishlistOpen} 
           onClose={() => setIsWishlistOpen(false)}
           onAddToCart={addToCart}
+        />
+
+        {/* AI Recipe Video Modal */}
+        <AIRecipeVideo 
+          isOpen={isRecipeVideoOpen} 
+          onClose={() => setIsRecipeVideoOpen(false)}
+          recipe={{
+            name: "Butter Chicken",
+            ingredients: ["Chicken 500g", "Butter 100g", "Tomato puree", "Cream", "Garam masala", "Kasuri methi"],
+            steps: ["Marinate chicken", "Cook in butter", "Add tomato puree", "Simmer with spices", "Finish with cream"],
+            cuisine: "North Indian",
+            prepTime: 15,
+            cookTime: 30,
+          }}
         />
       </div>
     </>
