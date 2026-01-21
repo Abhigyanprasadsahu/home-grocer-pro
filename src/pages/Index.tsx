@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Zap, Clock, RefreshCw, Truck, Shield, Gift, Timer } from 'lucide-react';
+import { Zap, Clock, RefreshCw, Truck, Shield, Gift, Timer, Sparkles, Star, TrendingUp, Flame } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import MinimalShopHeader from '@/components/MinimalShopHeader';
@@ -19,6 +19,7 @@ import Wishlist from '@/components/Wishlist';
 import { useLivePrices, LiveProduct } from '@/hooks/useLivePrices';
 import { useAuth } from '@/hooks/useAuth';
 import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from '@/lib/utils';
 
 interface CartItem {
   product: LiveProduct;
@@ -104,6 +105,12 @@ const Index = () => {
     return date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
   };
 
+  // Stats for display
+  const totalSavings = filteredProducts.reduce((acc, p) => {
+    const savings = (p.priceRange.max - (p.bestPrice || p.priceRange.max));
+    return acc + savings;
+  }, 0);
+
   return (
     <>
       <Helmet>
@@ -111,7 +118,7 @@ const Index = () => {
         <meta name="description" content="Order groceries online. Get fresh vegetables, fruits, dairy and more delivered in 10 minutes. Best prices guaranteed." />
       </Helmet>
 
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/20">
         <MinimalShopHeader
           cartCount={cartCount}
           onCartClick={() => setIsCartOpen(true)}
@@ -120,31 +127,60 @@ const Index = () => {
           onAddressClick={() => setIsAddressManagerOpen(true)}
         />
 
-        <main className="max-w-7xl mx-auto px-4 py-4 space-y-5 pb-32">
-          {/* Delivery Banner */}
-          <div className="flex items-center gap-4 px-4 py-3 bg-gradient-to-r from-primary/5 to-accent/5 rounded-2xl border border-primary/10">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                <Timer className="w-4 h-4 text-primary" />
+        <main className="max-w-7xl mx-auto px-4 py-4 space-y-6 pb-36">
+          {/* Premium Delivery Banner */}
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-primary/10 via-accent/5 to-primary/10 border border-primary/20">
+            {/* Decorative elements */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-accent/10 rounded-full blur-2xl" />
+            
+            <div className="relative flex flex-wrap items-center justify-between gap-4 px-5 py-4">
+              <div className="flex items-center gap-4">
+                {/* Animated Timer */}
+                <div className="relative">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg shadow-primary/30">
+                    <Timer className="w-6 h-6 text-primary-foreground" />
+                  </div>
+                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background flex items-center justify-center">
+                    <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
+                  </div>
+                </div>
+                
+                <div>
+                  <p className="text-sm font-bold text-foreground flex items-center gap-2">
+                    Delivery in 8-12 mins
+                    <span className="px-2 py-0.5 text-[10px] bg-green-500/10 text-green-600 rounded-full font-semibold">FAST</span>
+                  </p>
+                  <p className="text-xs text-muted-foreground">Free delivery on orders above ₹199</p>
+                </div>
               </div>
-              <div>
-                <p className="text-xs font-semibold text-foreground">Delivery in 10-15 mins</p>
-                <p className="text-[10px] text-muted-foreground">Free delivery on orders above ₹199</p>
+              
+              <div className="hidden sm:flex items-center gap-6">
+                {/* Live Price Indicator */}
+                <div className="flex items-center gap-2 px-3 py-2 bg-background/80 rounded-xl backdrop-blur-sm">
+                  <div className="relative">
+                    <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
+                    <div className="absolute inset-0 w-2.5 h-2.5 rounded-full bg-green-500 animate-ping opacity-50" />
+                  </div>
+                  <span className="text-xs font-medium text-foreground">Live Prices</span>
+                  <span className="text-[10px] text-muted-foreground">
+                    {formatLastUpdated() || 'Just now'}
+                  </span>
+                  <button
+                    onClick={refresh}
+                    disabled={isLoading}
+                    className="p-1 hover:bg-muted rounded-lg transition-colors"
+                  >
+                    <RefreshCw className={cn("w-3.5 h-3.5 text-primary", isLoading && "animate-spin")} />
+                  </button>
+                </div>
+                
+                {/* Savings indicator */}
+                <div className="flex items-center gap-2 px-3 py-2 bg-accent/10 rounded-xl">
+                  <TrendingUp className="w-4 h-4 text-accent" />
+                  <span className="text-xs font-semibold text-foreground">Save up to 40%</span>
+                </div>
               </div>
-            </div>
-            <div className="h-8 w-px bg-border" />
-            <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-              <span className="text-xs text-muted-foreground">
-                Live prices • Updated {formatLastUpdated() || 'just now'}
-              </span>
-              <button
-                onClick={refresh}
-                disabled={isLoading}
-                className="ml-2 p-1 hover:bg-muted rounded transition-colors"
-              >
-                <RefreshCw className={`w-3 h-3 text-muted-foreground ${isLoading ? 'animate-spin' : ''}`} />
-              </button>
             </div>
           </div>
 
@@ -184,49 +220,113 @@ const Index = () => {
           {/* Products Grid - Clean, Blinkit-style */}
           {!isLoading && (
             <section>
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-foreground">
-                  {activeCategory === 'All' ? 'Buy it again' : activeCategory}
-                </h2>
-                <span className="text-xs text-muted-foreground">{filteredProducts.length} items</span>
+              <div className="flex items-center justify-between mb-5">
+                <div>
+                  <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
+                    {activeCategory === 'All' ? (
+                      <>
+                        <Flame className="w-5 h-5 text-primary" />
+                        Popular right now
+                      </>
+                    ) : (
+                      <>
+                        Fresh {activeCategory}
+                      </>
+                    )}
+                  </h2>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {filteredProducts.length} items • Updated live
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] text-muted-foreground hidden sm:inline">Sort by:</span>
+                  <select className="text-xs bg-muted/50 border-0 rounded-lg px-2 py-1.5 text-foreground font-medium focus:ring-1 focus:ring-primary">
+                    <option>Popularity</option>
+                    <option>Price: Low to High</option>
+                    <option>Price: High to Low</option>
+                    <option>Discount</option>
+                  </select>
+                </div>
               </div>
 
               {filteredProducts.length === 0 ? (
-                <div className="text-center py-16">
-                  <p className="text-muted-foreground">No products found</p>
+                <div className="text-center py-20 bg-muted/30 rounded-3xl">
+                  <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span className="text-4xl">🔍</span>
+                  </div>
+                  <p className="font-semibold text-foreground">No products found</p>
+                  <p className="text-sm text-muted-foreground mt-1">Try a different search or category</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-                  {filteredProducts.map((product) => (
-                    <ProductCardMinimal
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                  {filteredProducts.map((product, index) => (
+                    <div 
                       key={product.id}
-                      product={product}
-                      quantity={cart.get(product.id)?.quantity || 0}
-                      onAdd={() => addToCart(product)}
-                      onRemove={() => removeFromCart(product.id)}
-                    />
+                      className="animate-fade-in"
+                      style={{ animationDelay: `${Math.min(index * 30, 300)}ms` }}
+                    >
+                      <ProductCardMinimal
+                        product={product}
+                        quantity={cart.get(product.id)?.quantity || 0}
+                        onAdd={() => addToCart(product)}
+                        onRemove={() => removeFromCart(product.id)}
+                      />
+                    </div>
                   ))}
                 </div>
               )}
             </section>
           )}
 
-          {/* Trust Footer */}
-          <section className="grid grid-cols-3 gap-3 pt-6">
-            <div className="flex flex-col items-center text-center p-3 bg-card rounded-xl border border-border/50">
-              <Truck className="w-5 h-5 text-primary mb-1.5" />
-              <p className="text-xs font-medium text-foreground">Free Delivery</p>
-              <p className="text-[10px] text-muted-foreground">₹199+</p>
+          {/* Premium Trust Footer */}
+          <section className="pt-8">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              {[
+                { icon: Truck, label: 'Free Delivery', desc: 'Orders ₹199+', color: 'text-primary', bg: 'bg-primary/10' },
+                { icon: Shield, label: '100% Fresh', desc: 'Quality guaranteed', color: 'text-green-600', bg: 'bg-green-500/10' },
+                { icon: Gift, label: 'Best Prices', desc: 'Price match promise', color: 'text-accent', bg: 'bg-accent/10' },
+                { icon: Star, label: '4.9 Rating', desc: '10K+ happy families', color: 'text-amber-500', bg: 'bg-amber-500/10' },
+              ].map((item, index) => (
+                <div 
+                  key={item.label}
+                  className={cn(
+                    "flex flex-col items-center text-center p-5 bg-card rounded-2xl border border-border/50",
+                    "hover:shadow-lg hover:border-primary/20 hover:-translate-y-1 transition-all duration-300",
+                    "group cursor-default"
+                  )}
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  <div className={cn(
+                    "w-12 h-12 rounded-2xl flex items-center justify-center mb-3 transition-all duration-300",
+                    "group-hover:scale-110 group-hover:shadow-lg",
+                    item.bg
+                  )}>
+                    <item.icon className={cn("w-6 h-6", item.color)} />
+                  </div>
+                  <p className="text-sm font-bold text-foreground">{item.label}</p>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">{item.desc}</p>
+                </div>
+              ))}
             </div>
-            <div className="flex flex-col items-center text-center p-3 bg-card rounded-xl border border-border/50">
-              <Shield className="w-5 h-5 text-green-600 mb-1.5" />
-              <p className="text-xs font-medium text-foreground">100% Fresh</p>
-              <p className="text-[10px] text-muted-foreground">Guaranteed</p>
-            </div>
-            <div className="flex flex-col items-center text-center p-3 bg-card rounded-xl border border-border/50">
-              <Gift className="w-5 h-5 text-accent mb-1.5" />
-              <p className="text-xs font-medium text-foreground">Best Prices</p>
-              <p className="text-[10px] text-muted-foreground">Price match</p>
+            
+            {/* App promo banner */}
+            <div className="mt-6 p-5 bg-gradient-to-r from-primary/5 via-primary/10 to-accent/5 rounded-2xl border border-primary/20 flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl gradient-hero flex items-center justify-center shadow-lg shadow-primary/20">
+                  <Zap className="w-7 h-7 text-primary-foreground" />
+                </div>
+                <div>
+                  <p className="font-bold text-foreground">Get ₹100 off on your first order!</p>
+                  <p className="text-xs text-muted-foreground flex items-center gap-2 mt-0.5">
+                    <Sparkles className="w-3 h-3 text-primary" />
+                    Use code <span className="font-bold text-primary">FLASH100</span> at checkout
+                  </p>
+                </div>
+              </div>
+              <Button variant="hero" size="sm" className="hidden sm:flex gap-1">
+                <Zap className="w-4 h-4" />
+                Claim Now
+              </Button>
             </div>
           </section>
         </main>
