@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { 
   Scale, Store, Sparkles, Heart, Bell, Percent, ShoppingCart, 
-  ChefHat, Video, MapPin, X, ChevronRight, Zap, Star
+  ChefHat, Video, MapPin, X, ChevronRight, Zap, Star, CalendarDays, Salad
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { StoreSummary } from '@/hooks/useLivePrices';
@@ -17,6 +17,7 @@ interface FloatingUtilityBarProps {
   onOpenSmartCart: () => void;
   onOpenWishlist: () => void;
   onOpenAddressManager: () => void;
+  onOpenAIPlanner: () => void;
 }
 
 // Big retail stores - for price comparison only
@@ -40,6 +41,7 @@ const FloatingUtilityBar = ({
   onOpenSmartCart,
   onOpenWishlist,
   onOpenAddressManager,
+  onOpenAIPlanner,
 }: FloatingUtilityBarProps) => {
   const [activePanel, setActivePanel] = useState<'compare' | 'kirana' | 'ai' | null>(null);
   const [hoveredButton, setHoveredButton] = useState<string | null>(null);
@@ -52,6 +54,8 @@ const FloatingUtilityBar = ({
   };
 
   const aiTools = [
+    { icon: CalendarDays, label: 'AI Planner', desc: 'Monthly grocery plan', onClick: onOpenAIPlanner, color: 'text-primary', bg: 'bg-primary/10', hoverBg: 'hover:bg-primary/20', featured: true },
+    { icon: Salad, label: 'Meal Planner', desc: 'Nutrition-based meals', onClick: onOpenRecipeFinder, color: 'text-emerald-500', bg: 'bg-emerald-500/10', hoverBg: 'hover:bg-emerald-500/20' },
     { icon: ChefHat, label: 'Recipe Finder', desc: 'AI-powered recipes', onClick: onOpenRecipeFinder, color: 'text-accent', bg: 'bg-accent/10', hoverBg: 'hover:bg-accent/20' },
     { icon: Video, label: 'Recipe Video', desc: 'Create cooking videos', onClick: onOpenRecipeVideo, color: 'text-pink-500', bg: 'bg-pink-500/10', hoverBg: 'hover:bg-pink-500/20' },
     { icon: Percent, label: 'Deal Finder', desc: 'Best price deals', onClick: onOpenDealFinder, color: 'text-green-500', bg: 'bg-green-500/10', hoverBg: 'hover:bg-green-500/20' },
@@ -61,6 +65,7 @@ const FloatingUtilityBar = ({
   ];
 
   const floatingButtons = [
+    { id: 'planner', icon: CalendarDays, label: 'Planner', onClick: onOpenAIPlanner, activeColor: 'bg-gradient-to-r from-primary to-accent', activeShadow: 'shadow-primary/30', featured: true },
     { id: 'ai', icon: Sparkles, label: 'AI Tools', activeColor: 'bg-gradient-to-r from-primary to-primary/80', activeShadow: 'shadow-primary/30' },
     { id: 'kirana', icon: Store, label: 'Kirana', activeColor: 'bg-gradient-to-r from-green-600 to-green-500', activeShadow: 'shadow-green-500/30', badge: orderableStores.length },
     { id: 'compare', icon: Scale, label: 'Compare', activeColor: 'bg-gradient-to-r from-amber-500 to-orange-500', activeShadow: 'shadow-amber-500/30', badge: selectedStores.length },
