@@ -17,11 +17,12 @@ import SmartCart from '@/components/SmartCart';
 import DeliveryAddressManager from '@/components/DeliveryAddressManager';
 import Wishlist from '@/components/Wishlist';
 import AIGroceryPlanner from '@/components/AIGroceryPlanner';
+import MyPlanSection from '@/components/MyPlanSection';
 import { useLivePrices, LiveProduct } from '@/hooks/useLivePrices';
 import { useAuth } from '@/hooks/useAuth';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 interface CartItem {
   product: LiveProduct;
@@ -186,6 +187,9 @@ const Index = () => {
               </div>
             </div>
           </div>
+
+          {/* My Plan Section - Shows user's household and grocery plans */}
+          <MyPlanSection onOpenPlanner={() => setIsAIPlannerOpen(true)} />
 
           {/* Category Navigation */}
           <MinimalCategoryNav 
@@ -426,25 +430,33 @@ const Index = () => {
         />
 
         {/* AI Grocery Planner Modal */}
-        <Dialog open={isAIPlannerOpen} onOpenChange={setIsAIPlannerOpen}>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
-            <AIGroceryPlanner 
-              household={{
-                id: 'guest',
-                name: 'My Household',
-                family_size: 4,
-                adults: 2,
-                children: 2,
-                monthly_budget: 15000,
-                diet_preferences: ['vegetarian'],
-              }}
-              onClose={() => setIsAIPlannerOpen(false)}
-              onPlanGenerated={() => {
-                setIsAIPlannerOpen(false);
-              }}
+        {isAIPlannerOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center">
+            {/* Backdrop */}
+            <div 
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              onClick={() => setIsAIPlannerOpen(false)}
             />
-          </DialogContent>
-        </Dialog>
+            {/* Modal Content */}
+            <div className="relative z-10 w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-background rounded-2xl shadow-2xl border border-border mx-4">
+              <AIGroceryPlanner 
+                household={{
+                  id: 'guest',
+                  name: 'My Household',
+                  family_size: 4,
+                  adults: 2,
+                  children: 2,
+                  monthly_budget: 15000,
+                  diet_preferences: ['vegetarian'],
+                }}
+                onClose={() => setIsAIPlannerOpen(false)}
+                onPlanGenerated={() => {
+                  setIsAIPlannerOpen(false);
+                }}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
