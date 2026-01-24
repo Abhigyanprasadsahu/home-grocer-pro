@@ -16,10 +16,12 @@ import AIPriceAlerts from '@/components/AIPriceAlerts';
 import SmartCart from '@/components/SmartCart';
 import DeliveryAddressManager from '@/components/DeliveryAddressManager';
 import Wishlist from '@/components/Wishlist';
+import AIGroceryPlanner from '@/components/AIGroceryPlanner';
 import { useLivePrices, LiveProduct } from '@/hooks/useLivePrices';
 import { useAuth } from '@/hooks/useAuth';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 
 interface CartItem {
   product: LiveProduct;
@@ -41,6 +43,7 @@ const Index = () => {
   const [isAddressManagerOpen, setIsAddressManagerOpen] = useState(false);
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
   const [isRecipeVideoOpen, setIsRecipeVideoOpen] = useState(false);
+  const [isAIPlannerOpen, setIsAIPlannerOpen] = useState(false);
 
   const { products, stores, isLoading, error, lastUpdated, refresh } = useLivePrices({
     category: activeCategory,
@@ -343,6 +346,7 @@ const Index = () => {
           onOpenSmartCart={() => setIsSmartCartOpen(true)}
           onOpenWishlist={() => setIsWishlistOpen(true)}
           onOpenAddressManager={() => setIsAddressManagerOpen(true)}
+          onOpenAIPlanner={() => setIsAIPlannerOpen(true)}
         />
 
         {/* Cart Sidebar */}
@@ -420,6 +424,27 @@ const Index = () => {
             cookTime: 30,
           }}
         />
+
+        {/* AI Grocery Planner Modal */}
+        <Dialog open={isAIPlannerOpen} onOpenChange={setIsAIPlannerOpen}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
+            <AIGroceryPlanner 
+              household={{
+                id: 'guest',
+                name: 'My Household',
+                family_size: 4,
+                adults: 2,
+                children: 2,
+                monthly_budget: 15000,
+                diet_preferences: ['vegetarian'],
+              }}
+              onClose={() => setIsAIPlannerOpen(false)}
+              onPlanGenerated={() => {
+                setIsAIPlannerOpen(false);
+              }}
+            />
+          </DialogContent>
+        </Dialog>
       </div>
     </>
   );
