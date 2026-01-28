@@ -1,8 +1,9 @@
-import { ShoppingCart, Search, Zap, MapPin, ChevronDown, Mic, X } from 'lucide-react';
+import { ShoppingCart, Search, Zap, MapPin, ChevronDown, Mic, X, CalendarDays } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface MinimalShopHeaderProps {
   cartCount: number;
@@ -19,6 +20,7 @@ const MinimalShopHeader = ({
   onSearchChange,
   onAddressClick,
 }: MinimalShopHeaderProps) => {
+  const navigate = useNavigate();
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [cartBounce, setCartBounce] = useState(false);
   const [prevCartCount, setPrevCartCount] = useState(cartCount);
@@ -103,40 +105,57 @@ const MinimalShopHeader = ({
             </button>
           </div>
 
-          {/* Cart Button with bounce animation */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onCartClick}
-            className={cn(
-              "relative gap-2 font-bold transition-all duration-300 h-10 px-4",
-              "hover:shadow-lg active:scale-95",
-              cartCount > 0 
-                ? "bg-gradient-to-r from-primary to-primary/90 text-primary-foreground hover:from-primary/90 hover:to-primary border-primary shadow-lg shadow-primary/20" 
-                : "hover:border-primary/50",
-              cartBounce && "animate-scale-in"
-            )}
-          >
-            <div className="relative">
-              <ShoppingCart className={cn(
-                "w-4 h-4 transition-transform duration-300",
-                cartBounce && "scale-125"
-              )} />
-              {cartCount > 0 && (
-                <div className="absolute -top-1.5 -right-1.5 w-2 h-2 bg-accent rounded-full animate-pulse" />
+          {/* Right side buttons */}
+          <div className="flex items-center gap-2">
+            {/* My Plan Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/my-plan')}
+              className={cn(
+                "relative gap-2 font-medium transition-all duration-300 h-10 px-3",
+                "hover:bg-primary/10 active:scale-95"
               )}
-            </div>
-            <span className="hidden sm:inline">Cart</span>
-            {cartCount > 0 && (
-              <span className={cn(
-                "min-w-[22px] h-[22px] rounded-full flex items-center justify-center text-xs font-bold",
-                "bg-primary-foreground text-primary transition-all duration-300",
-                cartBounce && "scale-125"
-              )}>
-                {cartCount}
-              </span>
-            )}
-          </Button>
+            >
+              <CalendarDays className="w-4 h-4 text-primary" />
+              <span className="hidden sm:inline text-sm">My Plan</span>
+            </Button>
+
+            {/* Cart Button with bounce animation */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onCartClick}
+              className={cn(
+                "relative gap-2 font-bold transition-all duration-300 h-10 px-4",
+                "hover:shadow-lg active:scale-95",
+                cartCount > 0 
+                  ? "bg-gradient-to-r from-primary to-primary/90 text-primary-foreground hover:from-primary/90 hover:to-primary border-primary shadow-lg shadow-primary/20" 
+                  : "hover:border-primary/50",
+                cartBounce && "animate-scale-in"
+              )}
+            >
+              <div className="relative">
+                <ShoppingCart className={cn(
+                  "w-4 h-4 transition-transform duration-300",
+                  cartBounce && "scale-125"
+                )} />
+                {cartCount > 0 && (
+                  <div className="absolute -top-1.5 -right-1.5 w-2 h-2 bg-accent rounded-full animate-pulse" />
+                )}
+              </div>
+              <span className="hidden sm:inline">Cart</span>
+              {cartCount > 0 && (
+                <span className={cn(
+                  "min-w-[22px] h-[22px] rounded-full flex items-center justify-center text-xs font-bold",
+                  "bg-primary-foreground text-primary transition-all duration-300",
+                  cartBounce && "scale-125"
+                )}>
+                  {cartCount}
+                </span>
+              )}
+            </Button>
+          </div>
         </div>
 
         {/* Search Bar with enhanced styling */}
