@@ -158,7 +158,7 @@ const Index = () => {
                     Delivery in 8-12 mins
                     <span className="px-2 py-0.5 text-[10px] bg-green-500/10 text-green-600 rounded-full font-semibold">FAST</span>
                   </p>
-                  <p className="text-xs text-muted-foreground">Free delivery on bulk orders ₹3000+ • Min order ₹100</p>
+                  <p className="text-xs text-muted-foreground">Free delivery on orders ₹100+ • Bulk orders ₹3000+ get priority</p>
                 </div>
               </div>
               
@@ -289,7 +289,7 @@ const Index = () => {
           <section className="pt-8">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               {[
-                { icon: Truck, label: 'Free Delivery', desc: 'Bulk orders ₹3000+', color: 'text-primary', bg: 'bg-primary/10' },
+                { icon: Truck, label: 'Free Delivery', desc: 'On all orders ₹100+', color: 'text-primary', bg: 'bg-primary/10' },
                 { icon: Shield, label: '100% Fresh', desc: 'Quality guaranteed', color: 'text-green-600', bg: 'bg-green-500/10' },
                 { icon: Gift, label: 'Best Prices', desc: 'Price match promise', color: 'text-accent', bg: 'bg-accent/10' },
                 { icon: Star, label: '4.9 Rating', desc: '10K+ happy families', color: 'text-amber-500', bg: 'bg-amber-500/10' },
