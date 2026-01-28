@@ -18,6 +18,7 @@ import DeliveryAddressManager from '@/components/DeliveryAddressManager';
 import Wishlist from '@/components/Wishlist';
 import AIGroceryPlanner from '@/components/AIGroceryPlanner';
 import MyPlanSection from '@/components/MyPlanSection';
+import PromoCarousel from '@/components/PromoCarousel';
 import { useLivePrices, LiveProduct } from '@/hooks/useLivePrices';
 import { useAuth } from '@/hooks/useAuth';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -132,6 +133,9 @@ const Index = () => {
         />
 
         <main className="max-w-7xl mx-auto px-4 py-4 space-y-6 pb-36">
+          {/* Promotional Carousel */}
+          <PromoCarousel />
+
           {/* Premium Delivery Banner */}
           <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-primary/10 via-accent/5 to-primary/10 border border-primary/20">
             {/* Decorative elements */}
