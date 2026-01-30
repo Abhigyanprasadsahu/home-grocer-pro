@@ -133,7 +133,9 @@ const Index = () => {
 
         <main className="max-w-7xl mx-auto px-4 py-4 space-y-6 pb-36">
           {/* Promotional Carousel */}
-          <PromoCarousel />
+          <div id="products-section">
+            <PromoCarousel onCategorySelect={setActiveCategory} />
+          </div>
 
           {/* Premium Delivery Banner */}
           <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-primary/10 via-accent/5 to-primary/10 border border-primary/20">
