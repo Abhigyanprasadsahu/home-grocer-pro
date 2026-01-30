@@ -31,8 +31,8 @@ const pickupLocations = [
 ];
 
 // Delivery pricing constants
-const BULK_FREE_DELIVERY_THRESHOLD = 2500;
-const SMALL_ORDER_DELIVERY_FEE = 100;
+const BULK_FREE_DELIVERY_THRESHOLD = 5000;
+const SMALL_ORDER_FREE_THRESHOLD = 100;
 
 interface CartSidebarProps {
   isOpen: boolean;
@@ -63,8 +63,8 @@ const CartSidebar = ({ isOpen, onClose, items, onUpdateQuantity, onRemove }: Car
   const getDeliveryFee = () => {
     if (deliveryType === 'pickup') return 0;
     if (selectedSlotData?.isExpress) return selectedSlotData.price; // Express always costs
-    if (isBulkOrder) return 0; // Free delivery for bulk orders (₹2500+)
-    return SMALL_ORDER_DELIVERY_FEE; // ₹100 for small orders
+    if (subtotal >= SMALL_ORDER_FREE_THRESHOLD) return 0; // Free delivery for orders ₹100+
+    return 30; // Small delivery fee for orders under ₹100
   };
   
   const deliveryFee = getDeliveryFee();
@@ -267,7 +267,7 @@ const CartSidebar = ({ isOpen, onClose, items, onUpdateQuantity, onRemove }: Car
                           <p className="text-xs font-medium text-primary mt-1">
                             {slot.isExpress 
                               ? `₹${slot.price}` 
-                              : (isBulkOrder ? 'FREE' : `₹${SMALL_ORDER_DELIVERY_FEE}`)
+                              : (subtotal >= SMALL_ORDER_FREE_THRESHOLD ? 'FREE' : '₹30')
                             }
                           </p>
                         </button>

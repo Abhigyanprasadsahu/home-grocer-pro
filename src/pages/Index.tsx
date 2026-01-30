@@ -158,7 +158,7 @@ const Index = () => {
                     Delivery in 8-12 mins
                     <span className="px-2 py-0.5 text-[10px] bg-green-500/10 text-green-600 rounded-full font-semibold">FAST</span>
                   </p>
-                  <p className="text-xs text-muted-foreground">Free delivery on orders ₹100+ • Bulk orders ₹3000+ get priority</p>
+                  <p className="text-xs text-muted-foreground">Free delivery on orders ₹100+ • Bulk orders ₹5000+ get free van delivery</p>
                 </div>
               </div>
               
