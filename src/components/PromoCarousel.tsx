@@ -36,7 +36,7 @@ const promoBanners: PromoBanner[] = [
   {
     id: '3',
     title: 'Free Delivery',
-    subtitle: 'On orders above ₹499 - No code needed',
+    subtitle: 'On orders above ₹100 - No code needed',
     cta: 'Order Now',
     gradient: 'from-blue-600 via-indigo-600 to-violet-600',
     icon: <Truck className="w-8 h-8" />,
