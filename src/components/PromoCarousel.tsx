@@ -3,6 +3,8 @@ import { ChevronLeft, ChevronRight, Zap, Percent, Gift, Clock, Truck, Package } 
 import { cn } from '@/lib/utils';
 import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 interface PromoBanner {
   id: string;
@@ -12,6 +14,10 @@ interface PromoBanner {
   gradient: string;
   icon: React.ReactNode;
   badge?: string;
+  action: 'scroll' | 'navigate' | 'filter' | 'toast';
+  target?: string;
+  category?: string;
+  toastMessage?: string;
 }
 
 const promoBanners: PromoBanner[] = [
@@ -23,6 +29,8 @@ const promoBanners: PromoBanner[] = [
     gradient: 'from-primary via-primary/90 to-emerald-600',
     icon: <Zap className="w-8 h-8" />,
     badge: 'Ends in 2h',
+    action: 'scroll',
+    target: 'products-section',
   },
   {
     id: '2',
@@ -32,6 +40,8 @@ const promoBanners: PromoBanner[] = [
     gradient: 'from-green-600 via-emerald-600 to-teal-600',
     icon: <Package className="w-8 h-8" />,
     badge: 'Best Value',
+    action: 'filter',
+    category: 'Staples',
   },
   {
     id: '3',
@@ -41,6 +51,8 @@ const promoBanners: PromoBanner[] = [
     gradient: 'from-orange-500 via-amber-500 to-yellow-500',
     icon: <Gift className="w-8 h-8" />,
     badge: 'Limited Time',
+    action: 'filter',
+    category: 'Snacks',
   },
   {
     id: '4',
@@ -49,6 +61,8 @@ const promoBanners: PromoBanner[] = [
     cta: 'Order Now',
     gradient: 'from-blue-600 via-indigo-600 to-violet-600',
     icon: <Truck className="w-8 h-8" />,
+    action: 'scroll',
+    target: 'products-section',
   },
   {
     id: '5',
@@ -58,6 +72,8 @@ const promoBanners: PromoBanner[] = [
     gradient: 'from-rose-500 via-pink-500 to-fuchsia-500',
     icon: <Percent className="w-8 h-8" />,
     badge: 'New',
+    action: 'navigate',
+    target: '/my-plan',
   },
   {
     id: '6',
@@ -67,10 +83,17 @@ const promoBanners: PromoBanner[] = [
     gradient: 'from-cyan-500 via-teal-500 to-emerald-500',
     icon: <Clock className="w-8 h-8" />,
     badge: 'Fast',
+    action: 'toast',
+    toastMessage: '⚡ Express delivery enabled! Your items will arrive in 10 minutes.',
   },
 ];
 
-const PromoCarousel = () => {
+interface PromoCarouselProps {
+  onCategorySelect?: (category: string) => void;
+}
+
+const PromoCarousel = ({ onCategorySelect }: PromoCarouselProps) => {
+  const navigate = useNavigate();
   const [emblaRef, emblaApi] = useEmblaCarousel(
     { loop: true, align: 'start' },
     [Autoplay({ delay: 4000, stopOnInteraction: false })]
@@ -82,6 +105,37 @@ const PromoCarousel = () => {
   const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
   const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
   const scrollTo = useCallback((index: number) => emblaApi?.scrollTo(index), [emblaApi]);
+
+  const handleBannerClick = useCallback((banner: PromoBanner) => {
+    switch (banner.action) {
+      case 'scroll':
+        if (banner.target) {
+          const element = document.getElementById(banner.target);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }
+        break;
+      case 'navigate':
+        if (banner.target) {
+          navigate(banner.target);
+        }
+        break;
+      case 'filter':
+        if (banner.category && onCategorySelect) {
+          onCategorySelect(banner.category);
+          toast.success(`Showing ${banner.category} products`, {
+            description: banner.subtitle,
+          });
+        }
+        break;
+      case 'toast':
+        if (banner.toastMessage) {
+          toast.success(banner.toastMessage);
+        }
+        break;
+    }
+  }, [navigate, onCategorySelect]);
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
@@ -155,11 +209,12 @@ const PromoCarousel = () => {
 
                   {/* CTA Button */}
                   <button
+                    onClick={() => handleBannerClick(banner)}
                     className={cn(
                       "shrink-0 px-5 sm:px-8 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base",
                       "bg-white text-gray-900 shadow-lg",
                       "hover:scale-105 active:scale-95 transition-all duration-200",
-                      "hover:shadow-xl"
+                      "hover:shadow-xl cursor-pointer"
                     )}
                   >
                     {banner.cta}
