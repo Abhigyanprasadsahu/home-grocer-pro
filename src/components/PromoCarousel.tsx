@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { ChevronLeft, ChevronRight, Zap, Percent, Gift, Clock, Truck } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Zap, Percent, Gift, Clock, Truck, Package } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
@@ -26,6 +26,15 @@ const promoBanners: PromoBanner[] = [
   },
   {
     id: '2',
+    title: 'Bulk Order Savings',
+    subtitle: 'Orders ₹5000+ get FREE van delivery + up to 40% off',
+    cta: 'Order Bulk',
+    gradient: 'from-green-600 via-emerald-600 to-teal-600',
+    icon: <Package className="w-8 h-8" />,
+    badge: 'Best Value',
+  },
+  {
+    id: '3',
     title: 'Weekend Special',
     subtitle: 'Buy 2 Get 1 Free on snacks & beverages',
     cta: 'Grab Deal',
@@ -34,7 +43,7 @@ const promoBanners: PromoBanner[] = [
     badge: 'Limited Time',
   },
   {
-    id: '3',
+    id: '4',
     title: 'Free Delivery',
     subtitle: 'On orders above ₹100 - No code needed',
     cta: 'Order Now',
@@ -42,7 +51,7 @@ const promoBanners: PromoBanner[] = [
     icon: <Truck className="w-8 h-8" />,
   },
   {
-    id: '4',
+    id: '5',
     title: 'Member Exclusive',
     subtitle: 'Extra 15% off with FlashCart Prime',
     cta: 'Join Prime',
@@ -51,7 +60,7 @@ const promoBanners: PromoBanner[] = [
     badge: 'New',
   },
   {
-    id: '5',
+    id: '6',
     title: 'Express Delivery',
     subtitle: 'Get groceries in 10 minutes flat',
     cta: 'Try Express',
