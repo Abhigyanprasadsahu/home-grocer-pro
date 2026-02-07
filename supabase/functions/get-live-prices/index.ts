@@ -21,15 +21,8 @@ serve(async (req) => {
     const category = url.searchParams.get('category');
     const storeId = url.searchParams.get('storeId');
     const productId = url.searchParams.get('productId');
-    const simulateFluctuation = url.searchParams.get('simulate') === 'true';
 
-    console.log('Fetching live prices with params:', { category, storeId, productId, simulateFluctuation });
-
-    // Simulate price fluctuation if requested (for demo purposes)
-    if (simulateFluctuation) {
-      await supabase.rpc('simulate_price_update');
-      console.log('Price fluctuation simulated');
-    }
+    console.log('Fetching live prices with params:', { category, storeId, productId });
 
     // Fetch stores
     const { data: stores, error: storesError } = await supabase
@@ -169,8 +162,7 @@ serve(async (req) => {
       meta: {
         totalProducts: productsWithPrices.length,
         totalStores: stores?.length || 0,
-        lastUpdated: new Date().toISOString(),
-        pricesSimulated: simulateFluctuation
+        lastUpdated: new Date().toISOString()
       }
     };
 
