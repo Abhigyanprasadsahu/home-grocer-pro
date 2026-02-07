@@ -59,7 +59,6 @@ interface LivePricesResponse {
     totalProducts: number;
     totalStores: number;
     lastUpdated: string;
-    pricesSimulated: boolean;
   };
 }
 
@@ -87,7 +86,7 @@ export function useLivePrices(options: UseLivePricesOptions = {}) {
     refreshInterval = 30 // refresh every 30 seconds by default
   } = options;
 
-  const fetchPrices = useCallback(async (simulate = false) => {
+  const fetchPrices = useCallback(async () => {
     try {
       setError(null);
       
@@ -95,7 +94,6 @@ export function useLivePrices(options: UseLivePricesOptions = {}) {
       if (category && category !== 'All') params.append('category', category);
       if (storeId) params.append('storeId', storeId);
       if (productId) params.append('productId', productId);
-      if (simulate) params.append('simulate', 'true');
 
       const { data, error: fnError } = await supabase.functions.invoke('get-live-prices', {
         body: null,
@@ -146,7 +144,7 @@ export function useLivePrices(options: UseLivePricesOptions = {}) {
     if (!autoRefresh) return;
 
     const interval = setInterval(() => {
-      fetchPrices(true); // simulate fluctuation on refresh
+      fetchPrices();
     }, refreshInterval * 1000);
 
     return () => clearInterval(interval);
@@ -154,7 +152,7 @@ export function useLivePrices(options: UseLivePricesOptions = {}) {
 
   const refresh = useCallback(() => {
     setIsLoading(true);
-    fetchPrices(true);
+    fetchPrices();
     toast({
       title: "Prices Updated",
       description: "Live prices have been refreshed",
