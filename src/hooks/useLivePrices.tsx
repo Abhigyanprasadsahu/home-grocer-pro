@@ -95,22 +95,17 @@ export function useLivePrices(options: UseLivePricesOptions = {}) {
       if (storeId) params.append('storeId', storeId);
       if (productId) params.append('productId', productId);
 
-      const { data, error: fnError } = await supabase.functions.invoke('get-live-prices', {
-        body: null,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      // Parse query params for filtering
       const queryString = params.toString();
       const url = queryString ? `?${queryString}` : '';
       
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-live-prices${url}`,
         {
           headers: {
-            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
         }
