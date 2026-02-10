@@ -92,11 +92,17 @@ const AIGroceryPlanner = ({ household, onClose, onPlanGenerated }: AIGroceryPlan
     setGeneratedPlan(null);
 
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        setIsGenerating(false);
+        return;
+      }
+
       const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-grocery-plan`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          'Authorization': `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
           prompt: prompt || `Create a smart ${planType} grocery plan for my household`,
