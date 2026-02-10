@@ -6,11 +6,26 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-interface PricePredictRequest {
-  productName: string;
-  category: string;
-  currentPrice: number;
-  historicalPrices?: { date: string; price: number }[];
+const MAX_STRING_LENGTH = 200;
+const MAX_HISTORICAL_PRICES = 100;
+
+function validateRequest(body: unknown): { productName: string; category: string; currentPrice: number; historicalPrices?: any[] } {
+  if (!body || typeof body !== "object") throw new Error("Invalid request body");
+  const { productName, category, currentPrice, historicalPrices } = body as any;
+  if (typeof productName !== "string" || productName.length === 0 || productName.length > MAX_STRING_LENGTH) throw new Error("productName must be 1-200 characters");
+  if (typeof category !== "string" || category.length === 0 || category.length > MAX_STRING_LENGTH) throw new Error("category must be 1-200 characters");
+  const price = Number(currentPrice);
+  if (isNaN(price) || price < 0 || price > 1000000) throw new Error("currentPrice must be 0-1000000");
+  if (historicalPrices !== undefined) {
+    if (!Array.isArray(historicalPrices) || historicalPrices.length > MAX_HISTORICAL_PRICES) throw new Error(`Maximum ${MAX_HISTORICAL_PRICES} historical prices`);
+    for (const hp of historicalPrices) {
+      if (!hp || typeof hp !== "object") throw new Error("Invalid historical price entry");
+      if (typeof hp.date !== "string" || hp.date.length > 20) throw new Error("Invalid date");
+      const p = Number(hp.price);
+      if (isNaN(p) || p < 0 || p > 1000000) throw new Error("Invalid historical price");
+    }
+  }
+  return { productName, category, currentPrice: price, historicalPrices };
 }
 
 serve(async (req) => {
@@ -19,133 +34,66 @@ serve(async (req) => {
   }
 
   try {
-    // Authenticate the user
     const authHeader = req.headers.get('Authorization');
     if (!authHeader?.startsWith('Bearer ')) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-      global: { headers: { Authorization: authHeader } }
-    });
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, { global: { headers: { Authorization: authHeader } } });
 
     const token = authHeader.replace('Bearer ', '');
     const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
     if (claimsError || !claimsData?.claims) {
-      console.error('Auth error:', claimsError);
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
-    const userId = claimsData.claims.sub;
-    console.log('Authenticated user:', userId);
+    let body: unknown;
+    try { body = await req.json(); } catch {
+      return new Response(JSON.stringify({ error: "Invalid JSON" }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
 
-    const { productName, category, currentPrice, historicalPrices } = await req.json() as PricePredictRequest;
+    let validated;
+    try { validated = validateRequest(body); } catch (e) {
+      return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Validation error" }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
+    const { productName, category, currentPrice, historicalPrices } = validated;
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
-    }
+    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
     const currentMonth = new Date().toLocaleString('default', { month: 'long' });
     const season = getSeason();
 
     const systemPrompt = `You are an expert in Indian grocery market price analysis. Analyze product prices and provide predictions.
+CONTEXT: Current Month: ${currentMonth}, Season: ${season}, Category: ${category}
+OUTPUT FORMAT (JSON): { "prediction": {...}, "seasonalFactors": [...], "alternatives": [...], "buyRecommendation": {...} }`;
 
-CONTEXT:
-- Current Month: ${currentMonth}
-- Season: ${season}
-- Category: ${category}
-
-OUTPUT FORMAT (JSON):
-{
-  "prediction": {
-    "trend": "up/down/stable",
-    "confidence": 85,
-    "expectedChange": "+5%/-10%/0%",
-    "bestTimeToBuy": "Now/Wait 2 weeks/Next month",
-    "reasoning": "Brief explanation"
-  },
-  "seasonalFactors": ["Festival season approaching", "Monsoon affects supply"],
-  "alternatives": [
-    {
-      "name": "Alternative product",
-      "priceComparison": "20% cheaper",
-      "nutritionSimilarity": "Similar protein content"
-    }
-  ],
-  "buyRecommendation": {
-    "action": "Buy Now/Wait/Stock Up",
-    "quantity": "1 week supply/2 kg/Monthly stock",
-    "reason": "Why this recommendation"
-  }
-}`;
-
-    const userPrompt = `Product: ${productName}
-Current Price: ₹${currentPrice}
-${historicalPrices?.length ? `Recent prices: ${historicalPrices.map(p => `${p.date}: ₹${p.price}`).join(", ")}` : ""}
-
-Analyze this product's price and provide buying recommendations.`;
+    const userPrompt = `Product: ${productName}\nCurrent Price: ₹${currentPrice}\n${historicalPrices?.length ? `Recent prices: ${historicalPrices.slice(0, 20).map((p: any) => `${p.date}: ₹${p.price}`).join(", ")}` : ""}\n\nAnalyze this product's price.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-      }),
+      headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ model: "google/gemini-2.5-flash", messages: [{ role: "system", content: systemPrompt }, { role: "user", content: userPrompt }] }),
     });
 
     if (!response.ok) {
-      if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Too many requests." }), {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "Service unavailable." }), {
-          status: 402,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
+      if (response.status === 429) return new Response(JSON.stringify({ error: "Too many requests." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      if (response.status === 402) return new Response(JSON.stringify({ error: "Service unavailable." }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       throw new Error("AI service error");
     }
 
     const data = await response.json();
     const content = data.choices?.[0]?.message?.content || "";
-    
     const jsonMatch = content.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
-      const parsed = JSON.parse(jsonMatch[0]);
-      return new Response(JSON.stringify(parsed), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return new Response(JSON.stringify(JSON.parse(jsonMatch[0])), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
-
-    return new Response(JSON.stringify({ error: "Failed to parse prediction" }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return new Response(JSON.stringify({ error: "Failed to parse prediction" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (error) {
     console.error("Price prediction error:", error);
-    return new Response(JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return new Response(JSON.stringify({ error: "An error occurred" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   }
 });
 
