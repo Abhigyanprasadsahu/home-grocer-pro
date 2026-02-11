@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Loader2, Percent, TrendingDown, Sparkles, AlertCircle, ArrowRight, RefreshCw } from 'lucide-react';
+import { Loader2, Percent, TrendingDown, AlertCircle, RefreshCw } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface Deal {
   productName: string;
@@ -11,9 +13,11 @@ interface Deal {
   savings: number;
   savingsPercent: number;
   store: string;
-  expiresIn: string;
+  storeLogo: string;
   category: string;
   quality: 'hot' | 'good' | 'normal';
+  productId: string;
+  storeId: string;
 }
 
 interface AIDealFinderProps {
@@ -29,43 +33,42 @@ const AIDealFinder = ({ isOpen, onClose, onAddToCart }: AIDealFinderProps) => {
   const [budget, setBudget] = useState('');
   const [error, setError] = useState('');
 
-  const categories = ['all', 'vegetables', 'fruits', 'dairy', 'grains', 'snacks', 'beverages'];
+  const categories = ['all', 'Vegetables', 'Fruits', 'Dairy', 'Grains', 'Snacks', 'Beverages', 'Meat', 'Spices'];
 
   const findDeals = async () => {
     setIsLoading(true);
     setError('');
     
     try {
-      // Simulate AI processing delay
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      // Mock deals data - in production this would come from the AI edge function
-      const mockDeals: Deal[] = [
-        { productName: 'Fresh Tomatoes 1kg', originalPrice: 50, dealPrice: 35, savings: 15, savingsPercent: 30, store: 'Sharma Kirana', expiresIn: '2h left', category: 'vegetables', quality: 'hot' },
-        { productName: 'Amul Butter 500g', originalPrice: 280, dealPrice: 245, savings: 35, savingsPercent: 12, store: 'Fresh Mart Kirana', expiresIn: '5h left', category: 'dairy', quality: 'good' },
-        { productName: 'Basmati Rice 5kg', originalPrice: 650, dealPrice: 520, savings: 130, savingsPercent: 20, store: 'City Grocers', expiresIn: '1d left', category: 'grains', quality: 'hot' },
-        { productName: 'Fresh Bananas 1kg', originalPrice: 60, dealPrice: 45, savings: 15, savingsPercent: 25, store: 'Patel Provision', expiresIn: '8h left', category: 'fruits', quality: 'good' },
-        { productName: 'Maggi Noodles 12pk', originalPrice: 180, dealPrice: 155, savings: 25, savingsPercent: 14, store: 'City Grocers', expiresIn: '3d left', category: 'snacks', quality: 'normal' },
-        { productName: 'Tata Tea Gold 1kg', originalPrice: 520, dealPrice: 440, savings: 80, savingsPercent: 15, store: 'Sharma Kirana', expiresIn: '2d left', category: 'beverages', quality: 'good' },
-        { productName: 'Onions 2kg', originalPrice: 80, dealPrice: 55, savings: 25, savingsPercent: 31, store: 'Fresh Mart Kirana', expiresIn: '4h left', category: 'vegetables', quality: 'hot' },
-        { productName: 'Aashirvaad Atta 10kg', originalPrice: 550, dealPrice: 465, savings: 85, savingsPercent: 15, store: 'Patel Provision', expiresIn: '1d left', category: 'grains', quality: 'good' },
-      ];
-
-      let filtered = selectedCategory === 'all' 
-        ? mockDeals 
-        : mockDeals.filter(d => d.category === selectedCategory);
-      
-      // Filter by budget if set
-      if (budget && !isNaN(parseFloat(budget))) {
-        const maxBudget = parseFloat(budget);
-        filtered = filtered.filter(d => d.dealPrice <= maxBudget);
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        toast.error('Please sign in to find deals.');
+        setIsLoading(false);
+        return;
       }
-      
-      // Sort by savings percentage
-      filtered.sort((a, b) => b.savingsPercent - a.savingsPercent);
-      
-      setDeals(filtered);
-    } catch (err: unknown) {
+
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-deal-finder`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          category: selectedCategory,
+          maxPrice: budget ? parseFloat(budget) : undefined,
+        }),
+      });
+
+      if (response.status === 401) {
+        toast.error('Please sign in to use this feature.');
+        return;
+      }
+
+      if (!response.ok) throw new Error('Failed to find deals');
+
+      const data = await response.json();
+      setDeals(data.deals || []);
+    } catch (err) {
       setError('Failed to find deals. Please try again.');
       console.error('Deal finder error:', err);
     } finally {
@@ -100,7 +103,7 @@ const AIDealFinder = ({ isOpen, onClose, onAddToCart }: AIDealFinderProps) => {
             </div>
             AI Deal Finder
             <span className="ml-auto text-xs font-normal text-muted-foreground bg-primary/10 px-2 py-1 rounded-full">
-              Powered by AI
+              Live Deals
             </span>
           </DialogTitle>
         </DialogHeader>
@@ -118,7 +121,7 @@ const AIDealFinder = ({ isOpen, onClose, onAddToCart }: AIDealFinderProps) => {
                     : 'bg-secondary hover:bg-secondary/80'
                 }`}
               >
-                {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                {cat === 'all' ? 'All' : cat}
               </button>
             ))}
           </div>
@@ -150,7 +153,7 @@ const AIDealFinder = ({ isOpen, onClose, onAddToCart }: AIDealFinderProps) => {
           {isLoading && (
             <div className="flex flex-col items-center justify-center py-12">
               <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
-              <p className="text-muted-foreground">AI is finding best deals for you...</p>
+              <p className="text-muted-foreground">Finding best deals across all stores...</p>
             </div>
           )}
 
@@ -159,7 +162,7 @@ const AIDealFinder = ({ isOpen, onClose, onAddToCart }: AIDealFinderProps) => {
             <div className="grid gap-3">
               {deals.map((deal, index) => (
                 <div
-                  key={index}
+                  key={`${deal.productId}-${deal.storeId}-${index}`}
                   className="p-4 bg-card border border-border rounded-xl hover:border-primary/30 hover:shadow-md transition-all"
                 >
                   <div className="flex items-start justify-between gap-4">
@@ -169,7 +172,7 @@ const AIDealFinder = ({ isOpen, onClose, onAddToCart }: AIDealFinderProps) => {
                         {getQualityBadge(deal.quality)}
                       </div>
                       <p className="text-sm text-muted-foreground mb-2">
-                        from <span className="text-foreground font-medium">{deal.store}</span>
+                        {deal.storeLogo} from <span className="text-foreground font-medium">{deal.store}</span>
                       </p>
                       <div className="flex items-center gap-3 flex-wrap">
                         <span className="text-lg font-bold text-green-600">₹{deal.dealPrice}</span>
@@ -180,7 +183,6 @@ const AIDealFinder = ({ isOpen, onClose, onAddToCart }: AIDealFinderProps) => {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs text-amber-600 font-medium mb-2">{deal.expiresIn}</p>
                       <Button 
                         size="sm" 
                         variant="hero"

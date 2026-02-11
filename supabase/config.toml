@@ -23,3 +23,6 @@ verify_jwt = false
 
 [functions.ai-recipe-video]
 verify_jwt = false
+
+[functions.ai-deal-finder]
+verify_jwt = false
