@@ -262,7 +262,7 @@ const ProductCardMinimal = ({ product, quantity, onAdd, onRemove }: ProductCardM
                 <span className="text-[10px] text-muted-foreground line-through leading-none">
                   ₹{maxPrice.toFixed(0)}
                 </span>
-                <span className="text-[9px] text-green-600 font-semibold leading-none mt-0.5">
+                <span className="text-[9px] text-primary font-semibold leading-none mt-0.5">
                   Save ₹{savings.toFixed(0)}
                 </span>
               </div>
