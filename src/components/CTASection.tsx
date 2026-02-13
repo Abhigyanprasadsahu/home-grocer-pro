@@ -1,5 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
+import { ScrollReveal } from "@/components/motion/ScrollReveal";
+import { motion } from "framer-motion";
 
 const CTASection = () => {
   return (
@@ -11,7 +13,7 @@ const CTASection = () => {
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
-        <div className="text-center max-w-3xl mx-auto">
+        <ScrollReveal variant="scale" className="text-center max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-foreground/10 text-primary-foreground font-medium text-sm mb-8">
             <Sparkles className="w-4 h-4" />
             <span>Join 10,000+ Smart Shoppers</span>
@@ -27,26 +29,23 @@ const CTASection = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button
-              size="xl"
-              className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 shadow-lg group"
-            >
-              Create Your Free Plan
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </Button>
-            <Button
-              variant="outline"
-              size="xl"
-              className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
-            >
-              Schedule a Demo
-            </Button>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
+              <Button size="xl" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 shadow-lg group">
+                Create Your Free Plan
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
+              <Button variant="outline" size="xl" className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground">
+                Schedule a Demo
+              </Button>
+            </motion.div>
           </div>
 
           <p className="mt-8 text-sm text-primary-foreground/60">
             ✓ Free forever plan available &nbsp;&nbsp; ✓ No credit card required &nbsp;&nbsp; ✓ Cancel anytime
           </p>
-        </div>
+        </ScrollReveal>
       </div>
     </section>
   );
