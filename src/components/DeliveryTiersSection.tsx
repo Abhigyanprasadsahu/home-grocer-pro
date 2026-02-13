@@ -101,11 +101,11 @@ const DeliveryTiersSection = () => {
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-border">
                   <span className="text-sm text-muted-foreground">Free Above</span>
-                  <span className="font-semibold text-green-600">{tier.freeAbove}</span>
+                  <span className="font-semibold text-primary">{tier.freeAbove}</span>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-border">
                   <span className="text-sm text-muted-foreground">Delivery Fee</span>
-                  <span className={tier.deliveryFee === "₹0" ? "font-semibold text-green-600" : "font-semibold"}>
+                  <span className={tier.deliveryFee === "₹0" ? "font-semibold text-primary" : "font-semibold"}>
                     {tier.deliveryFee}
                   </span>
                 </div>
@@ -136,8 +136,8 @@ const DeliveryTiersSection = () => {
         </div>
 
         {/* No Inventory Note */}
-        <div className="max-w-2xl mx-auto mt-12 p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl text-center">
-          <p className="text-amber-700">
+        <div className="max-w-2xl mx-auto mt-12 p-4 bg-accent/10 border border-accent/20 rounded-xl text-center">
+          <p className="text-foreground">
             <strong>💡 Zero Inventory Model:</strong> We source directly from local Kirana stores - 
             fresher products, no warehousing costs, supporting local businesses!
           </p>
