@@ -1,4 +1,4 @@
-import { ShoppingCart, Search, Zap, MapPin, ChevronDown, Mic, X, CalendarDays } from 'lucide-react';
+import { ShoppingCart, Search, Zap, MapPin, ChevronDown, Mic, X, CalendarDays, Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
@@ -107,6 +107,20 @@ const MinimalShopHeader = ({
 
           {/* Right side buttons */}
           <div className="flex items-center gap-2">
+            {/* Orders Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/orders')}
+              className={cn(
+                "relative gap-2 font-medium transition-all duration-300 h-10 px-3",
+                "hover:bg-primary/10 active:scale-95"
+              )}
+            >
+              <Package className="w-4 h-4 text-primary" />
+              <span className="hidden sm:inline text-sm">Orders</span>
+            </Button>
+
             {/* My Plan Button */}
             <Button
               variant="ghost"

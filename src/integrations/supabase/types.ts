@@ -67,6 +67,54 @@ export type Database = {
           },
         ]
       }
+      delivery_addresses: {
+        Row: {
+          address_line1: string
+          address_line2: string | null
+          city: string
+          created_at: string
+          full_name: string
+          id: string
+          is_default: boolean | null
+          label: string
+          phone: string
+          pincode: string
+          state: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address_line1: string
+          address_line2?: string | null
+          city?: string
+          created_at?: string
+          full_name: string
+          id?: string
+          is_default?: boolean | null
+          label?: string
+          phone: string
+          pincode: string
+          state?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address_line1?: string
+          address_line2?: string | null
+          city?: string
+          created_at?: string
+          full_name?: string
+          id?: string
+          is_default?: boolean | null
+          label?: string
+          phone?: string
+          pincode?: string
+          state?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       grocery_items: {
         Row: {
           best_price: number | null
@@ -235,6 +283,134 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      order_items: {
+        Row: {
+          created_at: string
+          id: string
+          order_id: string
+          product_id: string | null
+          product_image: string | null
+          product_name: string
+          quantity: number
+          store_name: string | null
+          total_price: number
+          unit: string
+          unit_price: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          order_id: string
+          product_id?: string | null
+          product_image?: string | null
+          product_name: string
+          quantity?: number
+          store_name?: string | null
+          total_price: number
+          unit?: string
+          unit_price: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          order_id?: string
+          product_id?: string | null
+          product_image?: string | null
+          product_name?: string
+          quantity?: number
+          store_name?: string | null
+          total_price?: number
+          unit?: string
+          unit_price?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          created_at: string
+          delivered_at: string | null
+          delivery_address_id: string | null
+          delivery_fee: number
+          delivery_slot: string | null
+          delivery_type: Database["public"]["Enums"]["delivery_type"]
+          discount: number
+          estimated_delivery: string | null
+          id: string
+          notes: string | null
+          order_number: string
+          pickup_location: string | null
+          status: Database["public"]["Enums"]["order_status"]
+          subtotal: number
+          total: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          delivered_at?: string | null
+          delivery_address_id?: string | null
+          delivery_fee?: number
+          delivery_slot?: string | null
+          delivery_type?: Database["public"]["Enums"]["delivery_type"]
+          discount?: number
+          estimated_delivery?: string | null
+          id?: string
+          notes?: string | null
+          order_number: string
+          pickup_location?: string | null
+          status?: Database["public"]["Enums"]["order_status"]
+          subtotal?: number
+          total?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          delivered_at?: string | null
+          delivery_address_id?: string | null
+          delivery_fee?: number
+          delivery_slot?: string | null
+          delivery_type?: Database["public"]["Enums"]["delivery_type"]
+          discount?: number
+          estimated_delivery?: string | null
+          id?: string
+          notes?: string | null
+          order_number?: string
+          pickup_location?: string | null
+          status?: Database["public"]["Enums"]["order_status"]
+          subtotal?: number
+          total?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_delivery_address_id_fkey"
+            columns: ["delivery_address_id"]
+            isOneToOne: false
+            referencedRelation: "delivery_addresses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       products: {
         Row: {
@@ -441,6 +617,7 @@ export type Database = {
       simulate_price_update: { Args: never; Returns: undefined }
     }
     Enums: {
+      delivery_type: "delivery" | "pickup"
       diet_preference:
         | "vegetarian"
         | "non_vegetarian"
@@ -450,6 +627,13 @@ export type Database = {
         | "low_carb"
         | "diabetic_friendly"
         | "keto"
+      order_status:
+        | "pending"
+        | "confirmed"
+        | "preparing"
+        | "out_for_delivery"
+        | "delivered"
+        | "cancelled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -577,6 +761,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      delivery_type: ["delivery", "pickup"],
       diet_preference: [
         "vegetarian",
         "non_vegetarian",
@@ -586,6 +771,14 @@ export const Constants = {
         "low_carb",
         "diabetic_friendly",
         "keto",
+      ],
+      order_status: [
+        "pending",
+        "confirmed",
+        "preparing",
+        "out_for_delivery",
+        "delivered",
+        "cancelled",
       ],
     },
   },
