@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ShoppingCart, X, Trash2, Plus, Minus, ArrowRight, Truck, Store, Clock, Zap, CheckCircle2, Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LiveProduct } from '@/hooks/useLivePrices';
@@ -43,6 +44,7 @@ interface CartSidebarProps {
 }
 
 const CartSidebar = ({ isOpen, onClose, items, onUpdateQuantity, onRemove }: CartSidebarProps) => {
+  const navigate = useNavigate();
   const [showDelivery, setShowDelivery] = useState(false);
   const [deliveryType, setDeliveryType] = useState<'delivery' | 'pickup'>('delivery');
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
@@ -332,6 +334,20 @@ const CartSidebar = ({ isOpen, onClose, items, onUpdateQuantity, onRemove }: Car
                   className="w-full" 
                   size="lg"
                   disabled={(deliveryType === 'delivery' && !selectedSlot) || (deliveryType === 'pickup' && !selectedPickup)}
+                  onClick={() => {
+                    const cartItemsData = items.map(item => ({
+                      productId: item.product.id,
+                      name: item.product.name,
+                      image: item.product.image,
+                      unit: item.product.unit,
+                      quantity: item.quantity,
+                      unitPrice: item.product.bestPrice || item.product.priceRange.min,
+                      totalPrice: (item.product.bestPrice || item.product.priceRange.min) * item.quantity,
+                      storeName: item.product.bestStore || undefined,
+                    }));
+                    onClose();
+                    navigate('/checkout', { state: { cartItems: cartItemsData, subtotal } });
+                  }}
                 >
                   Place Order
                   <ArrowRight className="w-4 h-4 ml-2" />
