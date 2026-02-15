@@ -64,8 +64,8 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Validation error" }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+    const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
+    if (!OPENAI_API_KEY) throw new Error("OPENAI_API_KEY is not configured");
 
     const currentMonth = new Date().toLocaleString('default', { month: 'long' });
     const currentSeason = getSeason();
@@ -90,14 +90,14 @@ CURRENT CONTEXT:
 You MUST respond with a valid JSON object with groceryItems, nutritionSummary, budgetBreakdown, seasonalTips, savingsTips, and explanation fields.
 Generate 30-50 items covering all essential categories. Prices should be realistic Indian market rates for ${currentMonth}.`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        Authorization: `Bearer ${OPENAI_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "gpt-4o-mini",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: prompt || `Create a smart ${planType} grocery plan optimized for my household.` },
