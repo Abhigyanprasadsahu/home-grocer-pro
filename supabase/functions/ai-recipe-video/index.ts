@@ -84,7 +84,7 @@ IMPORTANT: Make each imagePrompt hyper-realistic with professional food photogra
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ model: "google/gemini-2.5-flash", messages: [{ role: "system", content: systemPrompt }, { role: "user", content: userPrompt }] }),
+      body: JSON.stringify({ model: "google/gemini-3-flash-preview", messages: [{ role: "system", content: systemPrompt }, { role: "user", content: userPrompt }] }),
     });
 
     if (!response.ok) throw new Error("Failed to generate video script");
@@ -106,7 +106,7 @@ IMPORTANT: Make each imagePrompt hyper-realistic with professional food photogra
             method: "POST",
             headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
             body: JSON.stringify({
-              model: "google/gemini-2.5-flash-image-preview",
+              model: "google/gemini-2.5-flash-image",
               messages: [{ role: "user", content: `Generate a photorealistic, ultra high quality food photography image: ${scene.imagePrompt || `Professional food photography of ${recipe.name}, ${scene.visual}. Shot with a 50mm lens, warm directional lighting, shallow depth of field, styled on a rustic wooden surface.`}` }],
               modalities: ["image", "text"],
             }),
