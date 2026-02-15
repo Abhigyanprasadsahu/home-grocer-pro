@@ -60,7 +60,7 @@ const FloatingUtilityBar = ({
     { icon: Video, label: 'Recipe Video', desc: 'Create cooking videos', onClick: onOpenRecipeVideo, color: 'text-pink-500', bg: 'bg-pink-500/10', hoverBg: 'hover:bg-pink-500/20' },
     { icon: Percent, label: 'Deal Finder', desc: 'Best price deals', onClick: onOpenDealFinder, color: 'text-green-500', bg: 'bg-green-500/10', hoverBg: 'hover:bg-green-500/20' },
     { icon: Bell, label: 'Price Alerts', desc: 'Get notified', onClick: onOpenPriceAlerts, color: 'text-amber-500', bg: 'bg-amber-500/10', hoverBg: 'hover:bg-amber-500/20' },
-    { icon: ShoppingCart, label: 'Smart Cart', desc: 'Optimize your cart', onClick: onOpenSmartCart, color: 'text-blue-500', bg: 'bg-blue-500/10', hoverBg: 'hover:bg-blue-500/20' },
+    { icon: ShoppingCart, label: 'Smart Cart', desc: 'Auto deal tracker', onClick: onOpenSmartCart, color: 'text-blue-500', bg: 'bg-blue-500/10', hoverBg: 'hover:bg-blue-500/20' },
     { icon: Heart, label: 'Wishlist', desc: 'Saved items', onClick: onOpenWishlist, color: 'text-red-500', bg: 'bg-red-500/10', hoverBg: 'hover:bg-red-500/20' },
   ];
 
