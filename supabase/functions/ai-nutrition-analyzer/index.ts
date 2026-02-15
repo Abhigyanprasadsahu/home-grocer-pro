@@ -76,9 +76,8 @@ OUTPUT FORMAT (JSON): { "overallScore": 85, "scoreBreakdown": {...}, "analysis":
     });
 
     if (!response.ok) {
-      const errText = await response.text();
-      console.error("OpenAI error:", response.status, errText);
       if (response.status === 429) return new Response(JSON.stringify({ error: "Too many requests." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      if (response.status === 402) return new Response(JSON.stringify({ error: "Service unavailable." }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       throw new Error("AI service error");
     }
 

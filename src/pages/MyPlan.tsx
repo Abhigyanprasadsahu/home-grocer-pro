@@ -40,7 +40,7 @@ const MyPlan = () => {
     elderly: 0,
     monthly_budget: 15000,
     diet_preferences: ['vegetarian'],
-    preferred_stores: []
+    preferred_stores: ['BigBasket', 'D-Mart']
   };
 
   return (

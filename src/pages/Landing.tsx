@@ -131,6 +131,7 @@ const Landing = () => {
         <SmartCart
           isOpen={isSmartCartOpen}
           onClose={() => setIsSmartCartOpen(false)}
+          cartItems={[]}
         />
       </div>
     </>

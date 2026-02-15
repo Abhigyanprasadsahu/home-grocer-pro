@@ -77,22 +77,6 @@ interface GeneratedPlan {
   explanation?: string;
 }
 
-const toArray = (val: unknown): string[] => {
-  if (Array.isArray(val)) return val.map(v => typeof v === 'object' ? JSON.stringify(v) : String(v));
-  if (typeof val === 'string') return val.split(',').map(s => s.trim()).filter(Boolean);
-  if (val && typeof val === 'object') return Object.entries(val).map(([k, v]) => `${k}: ${v}`);
-  return [];
-};
-
-const safeString = (val: unknown): string => {
-  if (typeof val === 'string') return val;
-  if (typeof val === 'number') return String(val);
-  if (val && typeof val === 'object') {
-    try { return JSON.stringify(val); } catch { return ''; }
-  }
-  return '';
-};
-
 const AIGroceryPlanner = ({ household, onClose, onPlanGenerated }: AIGroceryPlannerProps) => {
   const { user } = useAuth();
   const [prompt, setPrompt] = useState('');
@@ -282,7 +266,7 @@ const AIGroceryPlanner = ({ household, onClose, onPlanGenerated }: AIGroceryPlan
               </div>
               <div className="p-3 bg-secondary/50 rounded-lg">
                 <p className="text-xs text-muted-foreground">Diet</p>
-                <p className="font-medium text-sm capitalize truncate">{(household.diet_preferences || []).join(', ').replace(/_/g, ' ')}</p>
+                <p className="font-medium text-sm capitalize truncate">{household.diet_preferences?.join(', ').replace(/_/g, ' ')}</p>
               </div>
               <div className="p-3 bg-secondary/50 rounded-lg">
                 <p className="text-xs text-muted-foreground">Plan Type</p>
@@ -395,77 +379,48 @@ const AIGroceryPlanner = ({ household, onClose, onPlanGenerated }: AIGroceryPlan
                   </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="items" className="mt-4 space-y-5">
-                  {Object.entries(itemsByCategory).map(([category, items]) => {
-                    const categoryTotal = items.reduce((s, i) => s + (i.estimated_price || 0), 0);
-                    return (
-                      <div key={category} className="space-y-2">
-                        <div className="flex items-center gap-2 sticky top-0 bg-background/95 backdrop-blur py-2 z-10">
-                          <span className="text-xl">{getCategoryIcon(category)}</span>
-                          <h4 className="font-semibold">{category}</h4>
-                          <Badge variant="outline" className="text-xs">
-                            {items.length} items
-                          </Badge>
-                          <span className="ml-auto font-bold text-sm text-primary">₹{categoryTotal.toLocaleString()}</span>
-                        </div>
-                        <div className="grid gap-2">
-                          {items.map((item, idx) => (
-                            <div 
-                              key={idx}
-                              className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl hover:bg-muted transition-colors border border-transparent hover:border-primary/10"
-                            >
-                              {/* Item icon placeholder */}
-                              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 text-lg">
-                                {getCategoryIcon(item.category)}
+                <TabsContent value="items" className="mt-4 space-y-4">
+                  {Object.entries(itemsByCategory).map(([category, items]) => (
+                    <div key={category} className="space-y-2">
+                      <div className="flex items-center gap-2 sticky top-0 bg-background/95 backdrop-blur py-2">
+                        <span className="text-xl">{getCategoryIcon(category)}</span>
+                        <h4 className="font-semibold">{category}</h4>
+                        <Badge variant="outline" className="ml-auto text-xs">
+                          {items.length} items
+                        </Badge>
+                      </div>
+                      <div className="grid gap-2">
+                        {items.map((item, idx) => (
+                          <div 
+                            key={idx}
+                            className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors"
+                          >
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2">
+                                <p className="font-medium text-sm">{item.name}</p>
+                                {item.priority && (
+                                  <Badge variant="outline" className={cn("text-[10px] px-1.5", getPriorityColor(item.priority))}>
+                                    {item.priority}
+                                  </Badge>
+                                )}
                               </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 flex-wrap">
-                                  <p className="font-semibold text-sm">{item.name}</p>
-                                  {item.priority && (
-                                    <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0", getPriorityColor(item.priority))}>
-                                      {item.priority}
-                                    </Badge>
-                                  )}
-                                  {item.ageGroup && item.ageGroup !== 'all' && (
-                                    <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
-                                      {item.ageGroup}
-                                    </Badge>
-                                  )}
-                                </div>
-                                <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
-                                  <span className="font-medium">{item.quantity} {item.unit}</span>
-                                  {item.nutritionHighlight && (
-                                    <span className="flex items-center gap-1 text-primary/80">
-                                      <Leaf className="w-3 h-3" />
-                                      {item.nutritionHighlight}
-                                    </span>
-                                  )}
-                                </div>
-                              </div>
-                              <div className="text-right shrink-0">
-                                <p className="font-bold text-primary text-base">₹{(item.estimated_price || 0).toLocaleString()}</p>
-                                {item.quantity > 1 && (
-                                  <p className="text-[10px] text-muted-foreground">
-                                    ₹{Math.round((item.estimated_price || 0) / item.quantity)}/{item.unit}
-                                  </p>
+                              <div className="flex items-center gap-2 mt-0.5">
+                                <span className="text-xs text-muted-foreground">
+                                  {item.quantity} {item.unit}
+                                </span>
+                                {item.nutritionHighlight && (
+                                  <span className="text-xs text-primary/70">
+                                    • {item.nutritionHighlight}
+                                  </span>
                                 )}
                               </div>
                             </div>
-                          ))}
-                        </div>
+                            <span className="font-bold text-primary">₹{item.estimated_price}</span>
+                          </div>
+                        ))}
                       </div>
-                    );
-                  })}
-                  {/* Grand total bar */}
-                  {generatedPlan.groceryItems?.length > 0 && (
-                    <div className="flex items-center justify-between p-4 rounded-xl bg-primary/10 border border-primary/20">
-                      <div>
-                        <p className="font-bold text-sm">Grand Total</p>
-                        <p className="text-xs text-muted-foreground">{generatedPlan.groceryItems.length} items across {Object.keys(itemsByCategory).length} categories</p>
-                      </div>
-                      <p className="text-2xl font-bold text-primary">₹{totalCost.toLocaleString()}</p>
                     </div>
-                  )}
+                  ))}
                 </TabsContent>
 
                 <TabsContent value="nutrition" className="mt-4 space-y-4">
@@ -478,7 +433,7 @@ const AIGroceryPlanner = ({ household, onClose, onPlanGenerated }: AIGroceryPlan
                             <h4 className="font-semibold text-sm">Protein Sources</h4>
                           </div>
                           <div className="flex flex-wrap gap-1">
-                            {toArray(generatedPlan.nutritionSummary.proteinSources).map((item, idx) => (
+                            {generatedPlan.nutritionSummary.proteinSources.map((item, idx) => (
                               <Badge key={idx} variant="secondary" className="text-xs">{item}</Badge>
                             ))}
                           </div>
@@ -489,7 +444,7 @@ const AIGroceryPlanner = ({ household, onClose, onPlanGenerated }: AIGroceryPlan
                             <h4 className="font-semibold text-sm">Fiber Rich</h4>
                           </div>
                           <div className="flex flex-wrap gap-1">
-                            {toArray(generatedPlan.nutritionSummary.fiberRich).map((item, idx) => (
+                            {generatedPlan.nutritionSummary.fiberRich.map((item, idx) => (
                               <Badge key={idx} variant="secondary" className="text-xs">{item}</Badge>
                             ))}
                           </div>
@@ -500,7 +455,7 @@ const AIGroceryPlanner = ({ household, onClose, onPlanGenerated }: AIGroceryPlan
                             <h4 className="font-semibold text-sm">Calcium Rich</h4>
                           </div>
                           <div className="flex flex-wrap gap-1">
-                            {toArray(generatedPlan.nutritionSummary.calciumRich).map((item, idx) => (
+                            {generatedPlan.nutritionSummary.calciumRich.map((item, idx) => (
                               <Badge key={idx} variant="secondary" className="text-xs">{item}</Badge>
                             ))}
                           </div>
@@ -511,7 +466,7 @@ const AIGroceryPlanner = ({ household, onClose, onPlanGenerated }: AIGroceryPlan
                             <h4 className="font-semibold text-sm">Iron Rich</h4>
                           </div>
                           <div className="flex flex-wrap gap-1">
-                            {toArray(generatedPlan.nutritionSummary.ironRich).map((item, idx) => (
+                            {generatedPlan.nutritionSummary.ironRich.map((item, idx) => (
                               <Badge key={idx} variant="secondary" className="text-xs">{item}</Badge>
                             ))}
                           </div>
@@ -525,13 +480,11 @@ const AIGroceryPlanner = ({ household, onClose, onPlanGenerated }: AIGroceryPlan
                             Budget Breakdown
                           </h4>
                           <div className="space-y-2">
-                            {Object.entries(generatedPlan.budgetBreakdown)
-                              .filter(([, val]) => typeof val === 'number')
-                              .map(([cat, amount]) => (
+                            {Object.entries(generatedPlan.budgetBreakdown).map(([cat, amount]) => (
                               <div key={cat} className="flex items-center gap-2">
                                 <span className="text-xs capitalize w-20">{cat}</span>
-                                <Progress value={totalCost > 0 ? ((amount as number) / totalCost) * 100 : 0} className="flex-1 h-2" />
-                                <span className="text-xs font-medium w-16 text-right">₹{(amount as number).toLocaleString()}</span>
+                                <Progress value={(amount / totalCost) * 100} className="flex-1 h-2" />
+                                <span className="text-xs font-medium w-16 text-right">₹{amount}</span>
                               </div>
                             ))}
                           </div>
@@ -548,7 +501,7 @@ const AIGroceryPlanner = ({ household, onClose, onPlanGenerated }: AIGroceryPlan
                         <Calendar className="w-4 h-4" />
                         Weekly Meal Suggestions
                       </h4>
-                      {toArray(generatedPlan.nutritionSummary?.weeklyMealIdeas).map((meal, idx) => (
+                      {generatedPlan.nutritionSummary.weeklyMealIdeas.map((meal, idx) => (
                         <div key={idx} className="p-3 bg-muted/50 rounded-lg flex items-start gap-3">
                           <span className="text-2xl">🍽️</span>
                           <p className="text-sm">{meal}</p>
@@ -566,7 +519,7 @@ const AIGroceryPlanner = ({ household, onClose, onPlanGenerated }: AIGroceryPlan
                         Seasonal Tips
                       </h4>
                       <ul className="space-y-2">
-                        {toArray(generatedPlan.seasonalTips).map((tip, idx) => (
+                        {generatedPlan.seasonalTips.map((tip, idx) => (
                           <li key={idx} className="text-sm flex items-start gap-2">
                             <span className="text-amber-500">•</span>
                             {tip}
@@ -583,7 +536,7 @@ const AIGroceryPlanner = ({ household, onClose, onPlanGenerated }: AIGroceryPlan
                         Money Saving Tips
                       </h4>
                       <ul className="space-y-2">
-                        {toArray(generatedPlan.savingsTips).map((tip, idx) => (
+                        {generatedPlan.savingsTips.map((tip, idx) => (
                           <li key={idx} className="text-sm flex items-start gap-2">
                             <span className="text-green-500">•</span>
                             {tip}
@@ -599,7 +552,7 @@ const AIGroceryPlanner = ({ household, onClose, onPlanGenerated }: AIGroceryPlan
                         <Sparkles className="w-4 h-4 text-primary" />
                         AI Insights
                       </h4>
-                      <p className="text-sm text-muted-foreground">{safeString(generatedPlan.explanation)}</p>
+                      <p className="text-sm text-muted-foreground">{generatedPlan.explanation}</p>
                     </div>
                   )}
                 </TabsContent>

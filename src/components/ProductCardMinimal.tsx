@@ -144,39 +144,45 @@ const ProductCardMinimal = ({ product, quantity, onAdd, onRemove }: ProductCardM
 
       {/* Product Image Area */}
       <div className={cn(
-        "relative aspect-square bg-gradient-to-br overflow-hidden",
+        "relative aspect-square bg-gradient-to-br p-4 flex items-center justify-center overflow-hidden",
         categoryStyles.gradient
       )}>
-        {/* Product Image */}
-        <div className={cn(
-          "absolute inset-0 transition-transform duration-500",
-          isHovered && "scale-110"
-        )}>
-          {product.image?.startsWith('http') ? (
-            <img
-              src={product.image}
-              alt={product.name}
-              className="w-full h-full object-cover"
-              loading="lazy"
-              onError={(e) => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400'; }}
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <span className="text-6xl sm:text-7xl select-none drop-shadow-lg">
-                {product.image}
-              </span>
-            </div>
-          )}
+        {/* Decorative Elements */}
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-white/40 rounded-full -translate-y-1/2 translate-x-1/2 blur-xl" />
+          <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/30 rounded-full translate-y-1/2 -translate-x-1/2 blur-xl" />
         </div>
         
-        {/* Shine sweep effect */}
-        <div className={cn(
-          "absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12",
-          "transition-transform duration-700 ease-out",
-          isHovered ? "translate-x-full" : "-translate-x-full"
-        )} />
+        {/* Product Emoji with Enhanced Effects */}
+        <div className="relative w-full h-full flex items-center justify-center">
+          <div className={cn(
+            "absolute inset-0 flex items-center justify-center transition-all duration-500",
+            isHovered && "scale-105"
+          )}>
+            {/* Subtle shadow under emoji */}
+            <div className={cn(
+              "absolute bottom-4 w-16 h-3 bg-black/10 rounded-full blur-md transition-all duration-500",
+              isHovered ? "w-20 opacity-30" : "opacity-20"
+            )} />
+            
+            <span className={cn(
+              "text-6xl sm:text-7xl select-none transition-all duration-500 drop-shadow-lg",
+              "group-hover:drop-shadow-2xl",
+              isHovered && "transform -translate-y-1"
+            )}>
+              {product.image}
+            </span>
+          </div>
+          
+          {/* Shine sweep effect */}
+          <div className={cn(
+            "absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -skew-x-12",
+            "transition-transform duration-700 ease-out",
+            isHovered ? "translate-x-full" : "-translate-x-full"
+          )} />
+        </div>
 
-        {/* Quantity Badge */}
+        {/* Quantity Badge with Animation */}
         {quantity > 0 && (
           <div className={cn(
             "absolute bottom-2 right-2 bg-primary text-primary-foreground w-7 h-7 rounded-full",

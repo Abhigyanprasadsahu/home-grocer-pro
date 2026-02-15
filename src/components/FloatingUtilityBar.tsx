@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { 
   Scale, Store, Sparkles, Heart, Bell, Percent, ShoppingCart, 
-  ChefHat, Video, MapPin, X, ChevronRight, Zap, Star, CalendarDays
+  ChefHat, Video, MapPin, X, ChevronRight, Zap, Star, CalendarDays, Salad
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { StoreSummary } from '@/hooks/useLivePrices';
@@ -55,11 +55,12 @@ const FloatingUtilityBar = ({
 
   const aiTools = [
     { icon: CalendarDays, label: 'AI Planner', desc: 'Monthly grocery plan', onClick: onOpenAIPlanner, color: 'text-primary', bg: 'bg-primary/10', hoverBg: 'hover:bg-primary/20', featured: true },
-    { icon: ChefHat, label: 'Recipe Finder', desc: 'AI-powered recipes & meals', onClick: onOpenRecipeFinder, color: 'text-accent', bg: 'bg-accent/10', hoverBg: 'hover:bg-accent/20' },
+    { icon: Salad, label: 'Meal Planner', desc: 'Nutrition-based meals', onClick: onOpenRecipeFinder, color: 'text-emerald-500', bg: 'bg-emerald-500/10', hoverBg: 'hover:bg-emerald-500/20' },
+    { icon: ChefHat, label: 'Recipe Finder', desc: 'AI-powered recipes', onClick: onOpenRecipeFinder, color: 'text-accent', bg: 'bg-accent/10', hoverBg: 'hover:bg-accent/20' },
     { icon: Video, label: 'Recipe Video', desc: 'Create cooking videos', onClick: onOpenRecipeVideo, color: 'text-pink-500', bg: 'bg-pink-500/10', hoverBg: 'hover:bg-pink-500/20' },
     { icon: Percent, label: 'Deal Finder', desc: 'Best price deals', onClick: onOpenDealFinder, color: 'text-green-500', bg: 'bg-green-500/10', hoverBg: 'hover:bg-green-500/20' },
     { icon: Bell, label: 'Price Alerts', desc: 'Get notified', onClick: onOpenPriceAlerts, color: 'text-amber-500', bg: 'bg-amber-500/10', hoverBg: 'hover:bg-amber-500/20' },
-    { icon: ShoppingCart, label: 'Smart Cart', desc: 'Auto deal tracker', onClick: onOpenSmartCart, color: 'text-blue-500', bg: 'bg-blue-500/10', hoverBg: 'hover:bg-blue-500/20' },
+    { icon: ShoppingCart, label: 'Smart Cart', desc: 'Optimize your cart', onClick: onOpenSmartCart, color: 'text-blue-500', bg: 'bg-blue-500/10', hoverBg: 'hover:bg-blue-500/20' },
     { icon: Heart, label: 'Wishlist', desc: 'Saved items', onClick: onOpenWishlist, color: 'text-red-500', bg: 'bg-red-500/10', hoverBg: 'hover:bg-red-500/20' },
   ];
 
