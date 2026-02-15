@@ -447,8 +447,6 @@ const Index = () => {
         <SmartCart 
           isOpen={isSmartCartOpen} 
           onClose={() => setIsSmartCartOpen(false)}
-          cartItems={cartItems}
-          stores={stores}
         />
 
         <DeliveryAddressManager 

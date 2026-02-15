@@ -6,12 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
+
 import { toast } from 'sonner';
 import { 
   Leaf, Users, Baby, User, UserCheck, 
   Salad, Beef, Egg, Dumbbell, Heart, 
-  Store, ArrowRight, ArrowLeft, Sparkles 
+  ArrowRight, ArrowLeft, Sparkles 
 } from 'lucide-react';
 
 type DietPreference = 'vegetarian' | 'non_vegetarian' | 'vegan' | 'eggetarian' | 'high_protein' | 'low_carb' | 'diabetic_friendly' | 'keto';
@@ -27,10 +27,7 @@ const DIET_OPTIONS: { value: DietPreference; label: string; icon: React.ReactNod
   { value: 'keto', label: 'Keto', icon: <Dumbbell className="w-5 h-5" /> },
 ];
 
-const STORE_OPTIONS = [
-  'D-Mart', 'Reliance Fresh', 'Big Bazaar', 'More Supermarket', 
-  'Spencer\'s', 'Star Bazaar', 'Nature\'s Basket', 'Local Kirana'
-];
+// Preferred stores removed - big retail stores can't share inventory
 
 const Onboarding = () => {
   const navigate = useNavigate();
@@ -45,7 +42,7 @@ const Onboarding = () => {
     elderly: 0,
     dietPreferences: ['vegetarian'] as DietPreference[],
     monthlyBudget: 5000,
-    preferredStores: [] as string[],
+    
     specialRequirements: ''
   });
 
@@ -66,14 +63,6 @@ const Onboarding = () => {
     }));
   };
 
-  const handleStoreToggle = (store: string) => {
-    setFormData(prev => ({
-      ...prev,
-      preferredStores: prev.preferredStores.includes(store)
-        ? prev.preferredStores.filter(s => s !== store)
-        : [...prev.preferredStores, store]
-    }));
-  };
 
   const handleSubmit = async () => {
     if (!user) return;
@@ -92,7 +81,7 @@ const Onboarding = () => {
           elderly: formData.elderly,
           diet_preferences: formData.dietPreferences,
           monthly_budget: formData.monthlyBudget,
-          preferred_stores: formData.preferredStores,
+          
           special_requirements: formData.specialRequirements || null
         });
 
@@ -169,13 +158,13 @@ const Onboarding = () => {
             <CardTitle className="font-display">
               {step === 1 && 'Family Members'}
               {step === 2 && 'Diet Preferences'}
-              {step === 3 && 'Budget & Stores'}
+              {step === 3 && 'Budget & Details'}
               {step === 4 && 'Review & Confirm'}
             </CardTitle>
             <CardDescription>
               {step === 1 && 'How many people are in your household?'}
               {step === 2 && 'What are your dietary preferences?'}
-              {step === 3 && 'Set your budget and preferred stores'}
+              {step === 3 && 'Set your budget and any special requirements'}
               {step === 4 && 'Review your household details'}
             </CardDescription>
           </CardHeader>
@@ -285,25 +274,6 @@ const Onboarding = () => {
                   />
                 </div>
 
-                <div className="space-y-3">
-                  <Label className="flex items-center gap-2">
-                    <Store className="w-4 h-4" /> Preferred Stores
-                  </Label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {STORE_OPTIONS.map(store => (
-                      <div key={store} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={store}
-                          checked={formData.preferredStores.includes(store)}
-                          onCheckedChange={() => handleStoreToggle(store)}
-                        />
-                        <Label htmlFor={store} className="text-sm font-normal cursor-pointer">
-                          {store}
-                        </Label>
-                      </div>
-                    ))}
-                  </div>
-                </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="requirements">Special Requirements (Optional)</Label>
@@ -337,12 +307,6 @@ const Onboarding = () => {
                     <span className="text-muted-foreground">Budget</span>
                     <span className="font-medium">₹{formData.monthlyBudget.toLocaleString()}/month</span>
                   </div>
-                  {formData.preferredStores.length > 0 && (
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Stores</span>
-                      <span className="font-medium">{formData.preferredStores.join(', ')}</span>
-                    </div>
-                  )}
                 </div>
 
                 <div className="p-4 bg-primary/10 rounded-lg flex items-start gap-3">
