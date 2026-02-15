@@ -379,48 +379,77 @@ const AIGroceryPlanner = ({ household, onClose, onPlanGenerated }: AIGroceryPlan
                   </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="items" className="mt-4 space-y-4">
-                  {Object.entries(itemsByCategory).map(([category, items]) => (
-                    <div key={category} className="space-y-2">
-                      <div className="flex items-center gap-2 sticky top-0 bg-background/95 backdrop-blur py-2">
-                        <span className="text-xl">{getCategoryIcon(category)}</span>
-                        <h4 className="font-semibold">{category}</h4>
-                        <Badge variant="outline" className="ml-auto text-xs">
-                          {items.length} items
-                        </Badge>
-                      </div>
-                      <div className="grid gap-2">
-                        {items.map((item, idx) => (
-                          <div 
-                            key={idx}
-                            className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors"
-                          >
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2">
-                                <p className="font-medium text-sm">{item.name}</p>
-                                {item.priority && (
-                                  <Badge variant="outline" className={cn("text-[10px] px-1.5", getPriorityColor(item.priority))}>
-                                    {item.priority}
-                                  </Badge>
-                                )}
+                <TabsContent value="items" className="mt-4 space-y-5">
+                  {Object.entries(itemsByCategory).map(([category, items]) => {
+                    const categoryTotal = items.reduce((s, i) => s + (i.estimated_price || 0), 0);
+                    return (
+                      <div key={category} className="space-y-2">
+                        <div className="flex items-center gap-2 sticky top-0 bg-background/95 backdrop-blur py-2 z-10">
+                          <span className="text-xl">{getCategoryIcon(category)}</span>
+                          <h4 className="font-semibold">{category}</h4>
+                          <Badge variant="outline" className="text-xs">
+                            {items.length} items
+                          </Badge>
+                          <span className="ml-auto font-bold text-sm text-primary">₹{categoryTotal.toLocaleString()}</span>
+                        </div>
+                        <div className="grid gap-2">
+                          {items.map((item, idx) => (
+                            <div 
+                              key={idx}
+                              className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl hover:bg-muted transition-colors border border-transparent hover:border-primary/10"
+                            >
+                              {/* Item icon placeholder */}
+                              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 text-lg">
+                                {getCategoryIcon(item.category)}
                               </div>
-                              <div className="flex items-center gap-2 mt-0.5">
-                                <span className="text-xs text-muted-foreground">
-                                  {item.quantity} {item.unit}
-                                </span>
-                                {item.nutritionHighlight && (
-                                  <span className="text-xs text-primary/70">
-                                    • {item.nutritionHighlight}
-                                  </span>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <p className="font-semibold text-sm">{item.name}</p>
+                                  {item.priority && (
+                                    <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0", getPriorityColor(item.priority))}>
+                                      {item.priority}
+                                    </Badge>
+                                  )}
+                                  {item.ageGroup && item.ageGroup !== 'all' && (
+                                    <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
+                                      {item.ageGroup}
+                                    </Badge>
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                                  <span className="font-medium">{item.quantity} {item.unit}</span>
+                                  {item.nutritionHighlight && (
+                                    <span className="flex items-center gap-1 text-primary/80">
+                                      <Leaf className="w-3 h-3" />
+                                      {item.nutritionHighlight}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="text-right shrink-0">
+                                <p className="font-bold text-primary text-base">₹{(item.estimated_price || 0).toLocaleString()}</p>
+                                {item.quantity > 1 && (
+                                  <p className="text-[10px] text-muted-foreground">
+                                    ₹{Math.round((item.estimated_price || 0) / item.quantity)}/{item.unit}
+                                  </p>
                                 )}
                               </div>
                             </div>
-                            <span className="font-bold text-primary">₹{item.estimated_price}</span>
-                          </div>
-                        ))}
+                          ))}
+                        </div>
                       </div>
+                    );
+                  })}
+                  {/* Grand total bar */}
+                  {generatedPlan.groceryItems?.length > 0 && (
+                    <div className="flex items-center justify-between p-4 rounded-xl bg-primary/10 border border-primary/20">
+                      <div>
+                        <p className="font-bold text-sm">Grand Total</p>
+                        <p className="text-xs text-muted-foreground">{generatedPlan.groceryItems.length} items across {Object.keys(itemsByCategory).length} categories</p>
+                      </div>
+                      <p className="text-2xl font-bold text-primary">₹{totalCost.toLocaleString()}</p>
                     </div>
-                  ))}
+                  )}
                 </TabsContent>
 
                 <TabsContent value="nutrition" className="mt-4 space-y-4">
