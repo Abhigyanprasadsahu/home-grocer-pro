@@ -515,11 +515,13 @@ const AIGroceryPlanner = ({ household, onClose, onPlanGenerated }: AIGroceryPlan
                             Budget Breakdown
                           </h4>
                           <div className="space-y-2">
-                            {Object.entries(generatedPlan.budgetBreakdown).map(([cat, amount]) => (
+                            {Object.entries(generatedPlan.budgetBreakdown)
+                              .filter(([, val]) => typeof val === 'number')
+                              .map(([cat, amount]) => (
                               <div key={cat} className="flex items-center gap-2">
                                 <span className="text-xs capitalize w-20">{cat}</span>
-                                <Progress value={(amount / totalCost) * 100} className="flex-1 h-2" />
-                                <span className="text-xs font-medium w-16 text-right">₹{amount}</span>
+                                <Progress value={totalCost > 0 ? ((amount as number) / totalCost) * 100 : 0} className="flex-1 h-2" />
+                                <span className="text-xs font-medium w-16 text-right">₹{(amount as number).toLocaleString()}</span>
                               </div>
                             ))}
                           </div>
