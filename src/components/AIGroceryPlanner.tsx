@@ -77,6 +77,12 @@ interface GeneratedPlan {
   explanation?: string;
 }
 
+const toArray = (val: unknown): string[] => {
+  if (Array.isArray(val)) return val.map(String);
+  if (typeof val === 'string') return val.split(',').map(s => s.trim()).filter(Boolean);
+  return [];
+};
+
 const AIGroceryPlanner = ({ household, onClose, onPlanGenerated }: AIGroceryPlannerProps) => {
   const { user } = useAuth();
   const [prompt, setPrompt] = useState('');
@@ -462,7 +468,7 @@ const AIGroceryPlanner = ({ household, onClose, onPlanGenerated }: AIGroceryPlan
                             <h4 className="font-semibold text-sm">Protein Sources</h4>
                           </div>
                           <div className="flex flex-wrap gap-1">
-                            {(generatedPlan.nutritionSummary.proteinSources || []).map((item, idx) => (
+                            {toArray(generatedPlan.nutritionSummary.proteinSources).map((item, idx) => (
                               <Badge key={idx} variant="secondary" className="text-xs">{item}</Badge>
                             ))}
                           </div>
@@ -473,7 +479,7 @@ const AIGroceryPlanner = ({ household, onClose, onPlanGenerated }: AIGroceryPlan
                             <h4 className="font-semibold text-sm">Fiber Rich</h4>
                           </div>
                           <div className="flex flex-wrap gap-1">
-                            {(generatedPlan.nutritionSummary.fiberRich || []).map((item, idx) => (
+                            {toArray(generatedPlan.nutritionSummary.fiberRich).map((item, idx) => (
                               <Badge key={idx} variant="secondary" className="text-xs">{item}</Badge>
                             ))}
                           </div>
@@ -484,7 +490,7 @@ const AIGroceryPlanner = ({ household, onClose, onPlanGenerated }: AIGroceryPlan
                             <h4 className="font-semibold text-sm">Calcium Rich</h4>
                           </div>
                           <div className="flex flex-wrap gap-1">
-                            {(generatedPlan.nutritionSummary.calciumRich || []).map((item, idx) => (
+                            {toArray(generatedPlan.nutritionSummary.calciumRich).map((item, idx) => (
                               <Badge key={idx} variant="secondary" className="text-xs">{item}</Badge>
                             ))}
                           </div>
@@ -495,7 +501,7 @@ const AIGroceryPlanner = ({ household, onClose, onPlanGenerated }: AIGroceryPlan
                             <h4 className="font-semibold text-sm">Iron Rich</h4>
                           </div>
                           <div className="flex flex-wrap gap-1">
-                            {(generatedPlan.nutritionSummary.ironRich || []).map((item, idx) => (
+                            {toArray(generatedPlan.nutritionSummary.ironRich).map((item, idx) => (
                               <Badge key={idx} variant="secondary" className="text-xs">{item}</Badge>
                             ))}
                           </div>
@@ -530,7 +536,7 @@ const AIGroceryPlanner = ({ household, onClose, onPlanGenerated }: AIGroceryPlan
                         <Calendar className="w-4 h-4" />
                         Weekly Meal Suggestions
                       </h4>
-                      {(generatedPlan.nutritionSummary.weeklyMealIdeas || []).map((meal, idx) => (
+                      {toArray(generatedPlan.nutritionSummary?.weeklyMealIdeas).map((meal, idx) => (
                         <div key={idx} className="p-3 bg-muted/50 rounded-lg flex items-start gap-3">
                           <span className="text-2xl">🍽️</span>
                           <p className="text-sm">{meal}</p>
@@ -548,7 +554,7 @@ const AIGroceryPlanner = ({ household, onClose, onPlanGenerated }: AIGroceryPlan
                         Seasonal Tips
                       </h4>
                       <ul className="space-y-2">
-                        {(generatedPlan.seasonalTips || []).map((tip, idx) => (
+                        {toArray(generatedPlan.seasonalTips).map((tip, idx) => (
                           <li key={idx} className="text-sm flex items-start gap-2">
                             <span className="text-amber-500">•</span>
                             {tip}
@@ -565,7 +571,7 @@ const AIGroceryPlanner = ({ household, onClose, onPlanGenerated }: AIGroceryPlan
                         Money Saving Tips
                       </h4>
                       <ul className="space-y-2">
-                        {(generatedPlan.savingsTips || []).map((tip, idx) => (
+                        {toArray(generatedPlan.savingsTips).map((tip, idx) => (
                           <li key={idx} className="text-sm flex items-start gap-2">
                             <span className="text-green-500">•</span>
                             {tip}
