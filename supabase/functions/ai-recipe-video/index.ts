@@ -24,15 +24,6 @@ function validateRequest(body: unknown): { recipe: any } {
   return { recipe };
 }
 
-interface Scene {
-  timestamp: string;
-  duration: number;
-  visual: string;
-  text: string;
-  voiceover: string;
-  imagePrompt: string;
-}
-
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -70,7 +61,7 @@ serve(async (req) => {
 
     const systemPrompt = `You are a creative food content creator making 20-second recipe videos for Gen-Z audience.
 Create a 4-scene video breakdown with specific, highly detailed image prompts for each scene.
-Each imagePrompt MUST describe a photorealistic, professional food photography scene. Include: lighting style (warm golden hour, studio softbox, moody backlit), camera angle (overhead flat-lay, 45-degree, close-up macro), food styling details (steam rising, sauce dripping, garnish placement), background/surface (rustic wood table, marble counter, dark slate), and mood (cozy, vibrant, elegant).
+Each imagePrompt MUST describe a photorealistic, professional food photography scene. Include: lighting style, camera angle, food styling details, background/surface, and mood.
 OUTPUT FORMAT (JSON only, no markdown):
 { "title": "Catchy title", "hook": "Opening hook", "scenes": [{ "timestamp": "0:00-0:05", "duration": 5, "visual": "Description", "text": "On-screen text", "voiceover": "Narration", "imagePrompt": "Ultra-detailed photorealistic food photography prompt" }], "hashtags": ["#recipe"], "musicStyle": "upbeat lo-fi beats" }`;
 
@@ -79,15 +70,19 @@ Recipe: ${recipe.name}
 Cuisine: ${recipe.cuisine}
 Ingredients: ${recipe.ingredients.slice(0, 20).join(', ')}
 Steps: ${recipe.steps.slice(0, 10).join('. ')}
-IMPORTANT: Make each imagePrompt hyper-realistic with professional food photography details. Think Bon Appétit magazine quality.`;
+IMPORTANT: Make each imagePrompt hyper-realistic with professional food photography details.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ model: "google/gemini-3-flash-preview", messages: [{ role: "system", content: systemPrompt }, { role: "user", content: userPrompt }] }),
+      body: JSON.stringify({ model: "google/gemini-2.5-flash", messages: [{ role: "system", content: systemPrompt }, { role: "user", content: userPrompt }] }),
     });
 
-    if (!response.ok) throw new Error("Failed to generate video script");
+    if (!response.ok) {
+      const errText = await response.text();
+      console.error("OpenAI error:", response.status, errText);
+      throw new Error("Failed to generate video script");
+    }
 
     const data = await response.json();
     const content = data.choices?.[0]?.message?.content || "";
@@ -96,18 +91,18 @@ IMPORTANT: Make each imagePrompt hyper-realistic with professional food photogra
 
     const parsed = JSON.parse(jsonMatch[0]);
 
-    // Limit scenes to max 4 to prevent excessive API calls
+    // Generate images using DALL-E for each scene
     if (parsed.scenes && Array.isArray(parsed.scenes)) {
       parsed.scenes = parsed.scenes.slice(0, 4);
       
-      const imagePromises = parsed.scenes.map(async (scene: Scene, idx: number) => {
+      const imagePromises = parsed.scenes.map(async (scene: any, idx: number) => {
         try {
           const imageResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
             method: "POST",
             headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
             body: JSON.stringify({
               model: "google/gemini-2.5-flash-image",
-              messages: [{ role: "user", content: `Generate a photorealistic, ultra high quality food photography image: ${scene.imagePrompt || `Professional food photography of ${recipe.name}, ${scene.visual}. Shot with a 50mm lens, warm directional lighting, shallow depth of field, styled on a rustic wooden surface.`}` }],
+              messages: [{ role: "user", content: `Generate a photorealistic, ultra high quality food photography image: ${scene.imagePrompt || `Professional food photography of ${recipe.name}, ${scene.visual}.`}` }],
               modalities: ["image", "text"],
             }),
           });

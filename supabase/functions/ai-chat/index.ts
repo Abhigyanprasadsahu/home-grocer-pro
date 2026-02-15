@@ -54,8 +54,6 @@ serve(async (req) => {
       });
     }
 
-    const userId = user.id;
-
     let body: unknown;
     try { body = await req.json(); } catch { 
       return new Response(JSON.stringify({ error: "Invalid JSON" }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
@@ -108,15 +106,16 @@ Fruits & Vegetables, Dairy & Eggs, Meat & Fish, Bakery, Beverages, Snacks, Grain
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: "google/gemini-2.5-flash",
         messages: [{ role: "system", content: systemPrompt }, ...messages],
         stream: true,
       }),
     });
 
     if (!response.ok) {
+      const errText = await response.text();
+      console.error("OpenAI error:", response.status, errText);
       if (response.status === 429) return new Response(JSON.stringify({ error: "Too many requests." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      if (response.status === 402) return new Response(JSON.stringify({ error: "Service temporarily unavailable." }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       return new Response(JSON.stringify({ error: "AI service error" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
