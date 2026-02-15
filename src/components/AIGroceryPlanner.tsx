@@ -126,11 +126,8 @@ const AIGroceryPlanner = ({ household, onClose, onPlanGenerated }: AIGroceryPlan
         return;
       }
 
-      if (response.status === 402) {
-        toast.error('AI credits exhausted. Please add more credits.');
-        setIsGenerating(false);
-        return;
-      }
+      // 402 is now handled by the edge function with a fallback response (200)
+      // so this case should rarely occur, but handle gracefully if it does
 
       if (!response.ok) {
         throw new Error('Failed to generate plan');

@@ -90,7 +90,7 @@ export const products: Product[] = [
   // Vegetables
   createProduct('v1', 'Fresh Tomatoes', 'vegetables', 'https://images.unsplash.com/photo-1546470427-227c7e61c738?w=200', '1 kg', 45),
   createProduct('v2', 'Onions', 'vegetables', 'https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?w=200', '1 kg', 35),
-  createProduct('v3', 'Potatoes', 'vegetables', 'https://images.unsplash.com/photo-1518977676601-b53f82ber927?w=200', '1 kg', 30),
+  createProduct('v3', 'Potatoes', 'vegetables', 'https://images.unsplash.com/photo-1518977676601-b53f82bbe9e8?w=200', '1 kg', 30),
   createProduct('v4', 'Green Capsicum', 'vegetables', 'https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?w=200', '500 g', 80),
   createProduct('v5', 'Carrots', 'vegetables', 'https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=200', '500 g', 50),
   createProduct('v6', 'Cauliflower', 'vegetables', 'https://images.unsplash.com/photo-1568584711075-3d021a7c3ca3?w=200', 'piece', 40),
