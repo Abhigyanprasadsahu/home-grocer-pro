@@ -190,13 +190,19 @@ const BulkOrderSection = ({ products, cart, onAddToCart, onRemoveFromCart }: Bul
             >
               <div className="flex gap-4">
                 {/* Product Image */}
-                <div className="w-24 h-24 rounded-xl overflow-hidden bg-muted shrink-0">
-                  <img 
-                    src={product.image} 
-                    alt={product.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    loading="lazy"
-                  />
+                <div className="w-24 h-24 rounded-xl overflow-hidden bg-gradient-to-br from-muted to-muted/50 shrink-0 flex items-center justify-center">
+                  {product.image && (product.image.startsWith('http') || product.image.startsWith('/')) ? (
+                    <img 
+                      src={product.image} 
+                      alt={product.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <span className="text-4xl select-none group-hover:scale-110 transition-transform duration-300">
+                      {product.image || '📦'}
+                    </span>
+                  )}
                 </div>
 
                 {/* Product Details */}
