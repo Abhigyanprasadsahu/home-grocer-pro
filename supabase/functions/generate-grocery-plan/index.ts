@@ -107,9 +107,12 @@ Generate 30-50 items covering all essential categories. Prices should be realist
     });
 
     if (!response.ok) {
+      const errBody = await response.text();
+      console.error("OpenAI API error:", response.status, errBody);
       if (response.status === 429) return new Response(JSON.stringify({ error: "Rate limits exceeded" }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      if (response.status === 402) return new Response(JSON.stringify({ error: "Payment required" }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      throw new Error("AI gateway error");
+      if (response.status === 401) return new Response(JSON.stringify({ error: "Invalid API key" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      if (response.status === 402 || response.status === 403) return new Response(JSON.stringify({ error: "API key issue - check billing or permissions" }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      throw new Error(`OpenAI API error: ${response.status}`);
     }
 
     const data = await response.json();
