@@ -366,161 +366,235 @@ const AIGroceryPlanner = ({ household, onClose, onPlanGenerated }: AIGroceryPlan
 
               {/* Tabs */}
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="grid w-full grid-cols-3 h-auto p-1">
+                <TabsList className="grid w-full grid-cols-4 h-auto p-1">
                   <TabsTrigger value="items" className="text-xs py-2 gap-1">
                     <ShoppingBag className="w-3 h-3" />
-                    Monthly List
+                    Items
                   </TabsTrigger>
                   <TabsTrigger value="nutrition" className="text-xs py-2 gap-1">
                     <Apple className="w-3 h-3" />
                     Nutrition
                   </TabsTrigger>
+                  <TabsTrigger value="meals" className="text-xs py-2 gap-1">
+                    <ChefHat className="w-3 h-3" />
+                    Meal Ideas
+                  </TabsTrigger>
                   <TabsTrigger value="tips" className="text-xs py-2 gap-1">
                     <Lightbulb className="w-3 h-3" />
-                    Tips & Meals
+                    Tips
                   </TabsTrigger>
                 </TabsList>
 
-                {/* ── ITEMS TAB: Simple flat list ── */}
-                <TabsContent value="items" className="mt-4 space-y-1">
-                  {/* Table header */}
-                  <div className="grid grid-cols-[1fr_100px_80px] gap-2 px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide border-b">
-                    <span>Item</span>
-                    <span className="text-center">Quantity</span>
-                    <span className="text-right">Price</span>
-                  </div>
-                  
-                  {(generatedPlan.groceryItems || []).map((item, idx) => (
-                    <div 
-                      key={idx}
-                      className="grid grid-cols-[1fr_100px_80px] gap-2 items-center px-3 py-2.5 rounded-lg hover:bg-muted/60 transition-colors border-b border-border/30 last:border-0"
-                    >
-                      <div className="flex items-center gap-2 min-w-0">
-                        <span className="text-base">{getCategoryIcon(item.category)}</span>
-                        <span className="font-medium text-sm truncate">{item.name}</span>
+                <TabsContent value="items" className="mt-4 space-y-5">
+                  {Object.entries(itemsByCategory).map(([category, items]) => {
+                    const categoryTotal = items.reduce((s, i) => s + (i.estimated_price || 0), 0);
+                    return (
+                      <div key={category} className="space-y-2">
+                        <div className="flex items-center gap-2 sticky top-0 bg-background/95 backdrop-blur py-2 z-10">
+                          <span className="text-xl">{getCategoryIcon(category)}</span>
+                          <h4 className="font-semibold">{category}</h4>
+                          <Badge variant="outline" className="text-xs">
+                            {items.length} items
+                          </Badge>
+                          <span className="ml-auto font-bold text-sm text-primary">₹{categoryTotal.toLocaleString()}</span>
+                        </div>
+                        <div className="grid gap-2">
+                          {items.map((item, idx) => (
+                            <div 
+                              key={idx}
+                              className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl hover:bg-muted transition-colors border border-transparent hover:border-primary/10"
+                            >
+                              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 text-lg">
+                                {getCategoryIcon(item.category)}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="font-semibold text-sm">
+                                  {item.name} — {item.quantity}{item.unit}
+                                </p>
+                                <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                                  {item.priority && (
+                                    <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0", getPriorityColor(item.priority))}>
+                                      {item.priority}
+                                    </Badge>
+                                  )}
+                                  {item.nutritionHighlight && (
+                                    <span className="flex items-center gap-1 text-xs text-primary/80">
+                                      <Leaf className="w-3 h-3" />
+                                      {item.nutritionHighlight}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                              <p className="font-bold text-primary text-base shrink-0">₹{(item.estimated_price || 0).toLocaleString()}</p>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                      <span className="text-sm text-center font-medium text-muted-foreground">
-                        {item.quantity} {item.unit}
-                      </span>
-                      <span className="text-sm text-right font-bold text-primary">
-                        ₹{(item.estimated_price || 0).toLocaleString()}
-                      </span>
-                    </div>
-                  ))}
-
-                  {/* Total */}
+                    );
+                  })}
+                  {/* Grand total bar */}
                   {generatedPlan.groceryItems?.length > 0 && (
-                    <div className="grid grid-cols-[1fr_100px_80px] gap-2 items-center px-3 py-3 mt-2 rounded-xl bg-primary/10 border border-primary/20 font-bold">
-                      <span className="text-sm">Total ({generatedPlan.groceryItems.length} items)</span>
-                      <span></span>
-                      <span className="text-right text-lg text-primary">₹{totalCost.toLocaleString()}</span>
+                    <div className="flex items-center justify-between p-4 rounded-xl bg-primary/10 border border-primary/20">
+                      <div>
+                        <p className="font-bold text-sm">Grand Total</p>
+                        <p className="text-xs text-muted-foreground">{generatedPlan.groceryItems.length} items across {Object.keys(itemsByCategory).length} categories</p>
+                      </div>
+                      <p className="text-2xl font-bold text-primary">₹{totalCost.toLocaleString()}</p>
                     </div>
                   )}
                 </TabsContent>
 
-                {/* ── NUTRITION TAB: Per-item nutrition ── */}
-                <TabsContent value="nutrition" className="mt-4 space-y-1">
-                  <div className="grid grid-cols-[1fr_100px_1fr] gap-2 px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide border-b">
-                    <span>Item</span>
-                    <span className="text-center">Qty</span>
-                    <span>Nutrition</span>
-                  </div>
-
-                  {(generatedPlan.groceryItems || []).map((item, idx) => (
-                    <div 
-                      key={idx}
-                      className="grid grid-cols-[1fr_100px_1fr] gap-2 items-center px-3 py-2.5 rounded-lg hover:bg-muted/60 transition-colors border-b border-border/30 last:border-0"
-                    >
-                      <span className="font-medium text-sm truncate">{item.name}</span>
-                      <span className="text-xs text-center text-muted-foreground">{item.quantity} {item.unit}</span>
-                      <span className="text-xs text-primary/80 flex items-center gap-1">
-                        {item.nutritionHighlight ? (
-                          <><Leaf className="w-3 h-3 shrink-0" /> {item.nutritionHighlight}</>
-                        ) : (
-                          <span className="text-muted-foreground">—</span>
-                        )}
-                      </span>
-                    </div>
-                  ))}
-
-                  {/* Summary cards */}
-                  {generatedPlan.nutritionSummary && (
-                    <div className="grid grid-cols-2 gap-3 pt-4">
-                      {[
-                        { label: 'Protein Sources', data: toArray(generatedPlan.nutritionSummary.proteinSources), icon: <Zap className="w-4 h-4" /> },
-                        { label: 'Fiber Rich', data: toArray(generatedPlan.nutritionSummary.fiberRich), icon: <Leaf className="w-4 h-4" /> },
-                        { label: 'Calcium Rich', data: toArray(generatedPlan.nutritionSummary.calciumRich), icon: <Milk className="w-4 h-4" /> },
-                        { label: 'Iron Rich', data: toArray(generatedPlan.nutritionSummary.ironRich), icon: <Heart className="w-4 h-4" /> },
-                      ].filter(s => s.data.length > 0).map((section) => (
-                        <div key={section.label} className="p-3 rounded-xl bg-muted/50 border">
-                          <div className="flex items-center gap-1.5 mb-2 text-primary">
-                            {section.icon}
-                            <h4 className="font-semibold text-xs">{section.label}</h4>
+                <TabsContent value="nutrition" className="mt-4 space-y-4">
+                  {/* Per-item nutrition highlights */}
+                  {generatedPlan.groceryItems?.some(i => i.nutritionHighlight) && (
+                    <div className="p-4 rounded-xl bg-muted/50 border">
+                      <h4 className="font-semibold text-sm mb-3 flex items-center gap-2">
+                        <Apple className="w-4 h-4 text-primary" />
+                        Item Nutrition Highlights
+                      </h4>
+                      <div className="grid gap-1.5">
+                        {(generatedPlan.groceryItems || []).filter(i => i.nutritionHighlight).map((item, idx) => (
+                          <div key={idx} className="flex items-center justify-between text-sm py-1.5 px-2 rounded-lg hover:bg-muted">
+                            <span className="font-medium">{item.name} ({item.quantity}{item.unit})</span>
+                            <span className="text-xs text-primary/80 flex items-center gap-1">
+                              <Leaf className="w-3 h-3" /> {item.nutritionHighlight}
+                            </span>
                           </div>
-                          <p className="text-xs text-muted-foreground">{section.data.join(', ')}</p>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {generatedPlan.nutritionSummary && (
+                    <>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="p-4 rounded-xl bg-primary/5 border border-primary/10">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Zap className="w-4 h-4 text-primary" />
+                            <h4 className="font-semibold text-sm">Protein Sources</h4>
+                          </div>
+                          <div className="flex flex-wrap gap-1">
+                            {toArray(generatedPlan.nutritionSummary.proteinSources).map((item, idx) => (
+                              <Badge key={idx} variant="secondary" className="text-xs">{item}</Badge>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="p-4 rounded-xl bg-primary/5 border border-primary/10">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Leaf className="w-4 h-4 text-primary" />
+                            <h4 className="font-semibold text-sm">Fiber Rich</h4>
+                          </div>
+                          <div className="flex flex-wrap gap-1">
+                            {toArray(generatedPlan.nutritionSummary.fiberRich).map((item, idx) => (
+                              <Badge key={idx} variant="secondary" className="text-xs">{item}</Badge>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="p-4 rounded-xl bg-primary/5 border border-primary/10">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Milk className="w-4 h-4 text-primary" />
+                            <h4 className="font-semibold text-sm">Calcium Rich</h4>
+                          </div>
+                          <div className="flex flex-wrap gap-1">
+                            {toArray(generatedPlan.nutritionSummary.calciumRich).map((item, idx) => (
+                              <Badge key={idx} variant="secondary" className="text-xs">{item}</Badge>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="p-4 rounded-xl bg-primary/5 border border-primary/10">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Heart className="w-4 h-4 text-primary" />
+                            <h4 className="font-semibold text-sm">Iron Rich</h4>
+                          </div>
+                          <div className="flex flex-wrap gap-1">
+                            {toArray(generatedPlan.nutritionSummary.ironRich).map((item, idx) => (
+                              <Badge key={idx} variant="secondary" className="text-xs">{item}</Badge>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {generatedPlan.budgetBreakdown && (
+                    <div className="p-4 rounded-xl bg-muted/50 border">
+                      <h4 className="font-semibold text-sm mb-3 flex items-center gap-2">
+                        <Wallet className="w-4 h-4" />
+                        Budget Breakdown
+                      </h4>
+                      <div className="space-y-2">
+                        {Object.entries(generatedPlan.budgetBreakdown)
+                          .filter(([, val]) => typeof val === 'number')
+                          .map(([cat, amount]) => (
+                          <div key={cat} className="flex items-center gap-2">
+                            <span className="text-xs capitalize w-20">{cat}</span>
+                            <Progress value={totalCost > 0 ? ((amount as number) / totalCost) * 100 : 0} className="flex-1 h-2" />
+                            <span className="text-xs font-medium w-16 text-right">₹{(amount as number).toLocaleString()}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </TabsContent>
+
+                <TabsContent value="meals" className="mt-4 space-y-4">
+                  {toArray(generatedPlan.nutritionSummary?.weeklyMealIdeas).length > 0 && (
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-sm flex items-center gap-2 mb-3">
+                        <Calendar className="w-4 h-4" />
+                        Weekly Meal Suggestions
+                      </h4>
+                      {toArray(generatedPlan.nutritionSummary?.weeklyMealIdeas).map((meal, idx) => (
+                        <div key={idx} className="p-3 bg-muted/50 rounded-xl flex items-start gap-3 border border-transparent hover:border-primary/10 transition-colors">
+                          <span className="text-xl mt-0.5">🍽️</span>
+                          <div>
+                            <p className="text-sm font-medium">Day {idx + 1}</p>
+                            <p className="text-sm text-muted-foreground">{meal}</p>
+                          </div>
                         </div>
                       ))}
                     </div>
                   )}
+                  {toArray(generatedPlan.nutritionSummary?.weeklyMealIdeas).length === 0 && (
+                    <p className="text-sm text-muted-foreground text-center py-8">No meal ideas generated. Try regenerating the plan.</p>
+                  )}
                 </TabsContent>
 
-                {/* ── TIPS & MEALS TAB ── */}
                 <TabsContent value="tips" className="mt-4 space-y-4">
-                  {/* Meal Ideas */}
-                  {toArray(generatedPlan.nutritionSummary?.weeklyMealIdeas).length > 0 && (
-                    <div className="p-4 rounded-xl bg-muted/50 border">
+                  {generatedPlan.seasonalTips && (
+                    <div className="p-4 rounded-xl bg-amber-500/5 border border-amber-500/10">
                       <h4 className="font-semibold text-sm mb-3 flex items-center gap-2">
-                        <ChefHat className="w-4 h-4 text-primary" />
-                        Weekly Meal Ideas
-                      </h4>
-                      <div className="space-y-2">
-                        {toArray(generatedPlan.nutritionSummary?.weeklyMealIdeas).map((meal, idx) => (
-                          <div key={idx} className="flex items-start gap-2 text-sm">
-                            <span className="text-primary font-bold shrink-0">Day {idx + 1}:</span>
-                            <span className="text-muted-foreground">{meal}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Seasonal Tips */}
-                  {toArray(generatedPlan.seasonalTips).length > 0 && (
-                    <div className="p-4 rounded-xl bg-muted/50 border">
-                      <h4 className="font-semibold text-sm mb-3 flex items-center gap-2">
-                        <Leaf className="w-4 h-4 text-primary" />
+                        <Leaf className="w-4 h-4 text-amber-600" />
                         Seasonal Tips
                       </h4>
-                      <ul className="space-y-1.5">
+                      <ul className="space-y-2">
                         {toArray(generatedPlan.seasonalTips).map((tip, idx) => (
                           <li key={idx} className="text-sm flex items-start gap-2">
-                            <span className="text-primary">•</span>
-                            <span className="text-muted-foreground">{tip}</span>
+                            <span className="text-amber-500">•</span>
+                            {tip}
                           </li>
                         ))}
                       </ul>
                     </div>
                   )}
 
-                  {/* Savings Tips */}
-                  {toArray(generatedPlan.savingsTips).length > 0 && (
-                    <div className="p-4 rounded-xl bg-muted/50 border">
+                  {generatedPlan.savingsTips && (
+                    <div className="p-4 rounded-xl bg-green-500/5 border border-green-500/10">
                       <h4 className="font-semibold text-sm mb-3 flex items-center gap-2">
-                        <TrendingDown className="w-4 h-4 text-primary" />
+                        <TrendingDown className="w-4 h-4 text-green-600" />
                         Money Saving Tips
                       </h4>
-                      <ul className="space-y-1.5">
+                      <ul className="space-y-2">
                         {toArray(generatedPlan.savingsTips).map((tip, idx) => (
                           <li key={idx} className="text-sm flex items-start gap-2">
-                            <span className="text-primary">•</span>
-                            <span className="text-muted-foreground">{tip}</span>
+                            <span className="text-green-500">•</span>
+                            {tip}
                           </li>
                         ))}
                       </ul>
                     </div>
                   )}
 
-                  {/* AI Explanation */}
                   {generatedPlan.explanation && (
                     <div className="p-4 rounded-xl bg-primary/5 border border-primary/10">
                       <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
