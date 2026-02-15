@@ -473,33 +473,23 @@ const Index = () => {
           }}
         />
 
-        {/* AI Grocery Planner Modal */}
+        {/* AI Grocery Planner Modal - component has its own overlay */}
         {isAIPlannerOpen && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center">
-            {/* Backdrop */}
-            <div 
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-              onClick={() => setIsAIPlannerOpen(false)}
-            />
-            {/* Modal Content */}
-            <div className="relative z-10 w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-background rounded-2xl shadow-2xl border border-border mx-4">
-              <AIGroceryPlanner 
-                household={{
-                  id: 'guest',
-                  name: 'My Household',
-                  family_size: 4,
-                  adults: 2,
-                  children: 2,
-                  monthly_budget: 15000,
-                  diet_preferences: ['vegetarian'],
-                }}
-                onClose={() => setIsAIPlannerOpen(false)}
-                onPlanGenerated={() => {
-                  setIsAIPlannerOpen(false);
-                }}
-              />
-            </div>
-          </div>
+          <AIGroceryPlanner 
+            household={{
+              id: 'guest',
+              name: 'My Household',
+              family_size: 4,
+              adults: 2,
+              children: 2,
+              monthly_budget: 15000,
+              diet_preferences: ['vegetarian'],
+            }}
+            onClose={() => setIsAIPlannerOpen(false)}
+            onPlanGenerated={() => {
+              setIsAIPlannerOpen(false);
+            }}
+          />
         )}
       </div>
     </>
