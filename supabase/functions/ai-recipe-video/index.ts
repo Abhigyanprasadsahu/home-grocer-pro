@@ -87,7 +87,27 @@ IMPORTANT: Make each imagePrompt hyper-realistic with professional food photogra
       body: JSON.stringify({ model: "google/gemini-2.5-flash", messages: [{ role: "system", content: systemPrompt }, { role: "user", content: userPrompt }] }),
     });
 
-    if (!response.ok) throw new Error("Failed to generate video script");
+    if (!response.ok) {
+      if (response.status === 402) {
+        console.warn("AI gateway returned 402, using fallback video script");
+        const fallbackScript = {
+          title: `How to Make ${recipe.name}`,
+          hook: `Learn to make delicious ${recipe.name} in just 20 seconds!`,
+          scenes: [
+            { timestamp: "0:00-0:05", duration: 5, visual: "Ingredients laid out beautifully", text: `${recipe.name} - Fresh Ingredients`, voiceover: `Let's make ${recipe.name}!`, imagePrompt: "", image: null },
+            { timestamp: "0:05-0:10", duration: 5, visual: "Preparation and chopping", text: "Prep Time", voiceover: "Start by preparing your ingredients.", imagePrompt: "", image: null },
+            { timestamp: "0:10-0:15", duration: 5, visual: "Cooking in progress", text: "Cooking Magic", voiceover: "Now let the magic happen.", imagePrompt: "", image: null },
+            { timestamp: "0:15-0:20", duration: 5, visual: "Final plated dish", text: "Ready to Serve!", voiceover: `Your ${recipe.name} is ready! Enjoy!`, imagePrompt: "", image: null },
+          ],
+          hashtags: ["#recipe", "#homecooking", "#foodie"],
+          musicStyle: "upbeat lo-fi beats",
+          totalDuration: 20,
+          frameRate: "5fps equivalent",
+        };
+        return new Response(JSON.stringify(fallbackScript), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+      throw new Error("Failed to generate video script");
+    }
 
     const data = await response.json();
     const content = data.choices?.[0]?.message?.content || "";
