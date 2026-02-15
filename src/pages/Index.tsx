@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import MinimalShopHeader from '@/components/MinimalShopHeader';
 import MinimalCategoryNav from '@/components/MinimalCategoryNav';
 import ProductCardMinimal from '@/components/ProductCardMinimal';
+import BulkOrderSection from '@/components/BulkOrderSection';
 import CartSidebar from '@/components/CartSidebar';
 import FloatingUtilityBar from '@/components/FloatingUtilityBar';
 import AIChatbot from '@/components/AIChatbot';
@@ -45,6 +46,7 @@ const Index = () => {
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
   const [isRecipeVideoOpen, setIsRecipeVideoOpen] = useState(false);
   const [isAIPlannerOpen, setIsAIPlannerOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<'quick' | 'bulk'>('quick');
 
   const { products, stores, isLoading, error, lastUpdated, refresh } = useLivePrices({
     category: activeCategory,
@@ -193,11 +195,41 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Category Navigation */}
-          <MinimalCategoryNav 
-            activeCategory={activeCategory} 
-            onCategoryChange={setActiveCategory} 
-          />
+          {/* Quick / Bulk Mode Toggle */}
+          <div className="flex p-1 bg-secondary/50 rounded-xl border border-border/50 max-w-md">
+            <button
+              onClick={() => setViewMode('quick')}
+              className={cn(
+                "flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-semibold transition-all",
+                viewMode === 'quick'
+                  ? "bg-background text-foreground shadow-sm border border-border/50"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <Zap className="w-4 h-4" />
+              Quick Shop
+            </button>
+            <button
+              onClick={() => setViewMode('bulk')}
+              className={cn(
+                "flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-semibold transition-all",
+                viewMode === 'bulk'
+                  ? "bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <Truck className="w-4 h-4" />
+              Bulk Order
+            </button>
+          </div>
+
+          {viewMode === 'quick' && (
+            <>
+            {/* Category Navigation */}
+            <MinimalCategoryNav 
+              activeCategory={activeCategory} 
+              onCategoryChange={setActiveCategory} 
+            />
 
           {/* Loading State */}
           {isLoading && products.length === 0 && (
@@ -285,13 +317,25 @@ const Index = () => {
                 </div>
               )}
             </section>
+           )}
+            </>
+          )}
+
+          {/* Bulk Order Section */}
+          {viewMode === 'bulk' && (
+            <BulkOrderSection
+              products={products}
+              cart={cart}
+              onAddToCart={addToCart}
+              onRemoveFromCart={removeFromCart}
+            />
           )}
 
           {/* Premium Trust Footer */}
           <section className="pt-8">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               {[
-                { icon: Truck, label: 'Free Delivery', desc: 'On all orders ₹100+', color: 'text-primary', bg: 'bg-primary/10' },
+                { icon: Truck, label: 'Free Delivery', desc: viewMode === 'bulk' ? 'On bulk orders ₹5,000+' : 'On all orders ₹100+', color: 'text-primary', bg: 'bg-primary/10' },
                 { icon: Shield, label: '100% Fresh', desc: 'Quality guaranteed', color: 'text-green-600', bg: 'bg-green-500/10' },
                 { icon: Gift, label: 'Best Prices', desc: 'Price match promise', color: 'text-accent', bg: 'bg-accent/10' },
                 { icon: Star, label: '4.9 Rating', desc: '10K+ happy families', color: 'text-amber-500', bg: 'bg-amber-500/10' },
