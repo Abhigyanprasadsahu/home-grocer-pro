@@ -192,10 +192,11 @@ const BulkOrderSection = ({ products, cart, onAddToCart, onRemoveFromCart }: Bul
                 {/* Product Image */}
                 <div className="w-24 h-24 rounded-xl overflow-hidden bg-muted shrink-0">
                   <img 
-                    src={product.image} 
+                    src={product.image || `https://images.unsplash.com/photo-1542838132-92c53300491e?w=400`} 
                     alt={product.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     loading="lazy"
+                    onError={(e) => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400'; }}
                   />
                 </div>
 
