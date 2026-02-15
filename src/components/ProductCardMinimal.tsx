@@ -159,19 +159,24 @@ const ProductCardMinimal = ({ product, quantity, onAdd, onRemove }: ProductCardM
             "absolute inset-0 flex items-center justify-center transition-all duration-500",
             isHovered && "scale-105"
           )}>
-            {/* Subtle shadow under emoji */}
-            <div className={cn(
-              "absolute bottom-4 w-16 h-3 bg-black/10 rounded-full blur-md transition-all duration-500",
-              isHovered ? "w-20 opacity-30" : "opacity-20"
-            )} />
-            
-            <span className={cn(
-              "text-6xl sm:text-7xl select-none transition-all duration-500 drop-shadow-lg",
-              "group-hover:drop-shadow-2xl",
-              isHovered && "transform -translate-y-1"
-            )}>
-              {product.image}
-            </span>
+            {product.image && (product.image.startsWith('http') || product.image.startsWith('/')) ? (
+              <img 
+                src={product.image}
+                alt={product.name}
+                className={cn(
+                  "w-full h-full object-cover transition-all duration-500",
+                  isHovered && "transform scale-105"
+                )}
+                loading="lazy"
+              />
+            ) : (
+              <span className={cn(
+                "text-6xl sm:text-7xl select-none transition-all duration-500 drop-shadow-lg",
+                isHovered && "transform -translate-y-1"
+              )}>
+                {product.image}
+              </span>
+            )}
           </div>
           
           {/* Shine sweep effect */}
