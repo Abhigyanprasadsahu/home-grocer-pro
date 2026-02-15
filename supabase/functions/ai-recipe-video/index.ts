@@ -69,15 +69,17 @@ serve(async (req) => {
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
     const systemPrompt = `You are a creative food content creator making 20-second recipe videos for Gen-Z audience.
-Create a 4-scene video breakdown with specific image prompts for each scene.
+Create a 4-scene video breakdown with specific, highly detailed image prompts for each scene.
+Each imagePrompt MUST describe a photorealistic, professional food photography scene. Include: lighting style (warm golden hour, studio softbox, moody backlit), camera angle (overhead flat-lay, 45-degree, close-up macro), food styling details (steam rising, sauce dripping, garnish placement), background/surface (rustic wood table, marble counter, dark slate), and mood (cozy, vibrant, elegant).
 OUTPUT FORMAT (JSON only, no markdown):
-{ "title": "Catchy title", "hook": "Opening hook", "scenes": [{ "timestamp": "0:00-0:05", "duration": 5, "visual": "Description", "text": "On-screen text", "voiceover": "Narration", "imagePrompt": "Detailed image prompt" }], "hashtags": ["#recipe"], "musicStyle": "upbeat lo-fi beats" }`;
+{ "title": "Catchy title", "hook": "Opening hook", "scenes": [{ "timestamp": "0:00-0:05", "duration": 5, "visual": "Description", "text": "On-screen text", "voiceover": "Narration", "imagePrompt": "Ultra-detailed photorealistic food photography prompt" }], "hashtags": ["#recipe"], "musicStyle": "upbeat lo-fi beats" }`;
 
     const userPrompt = `Create a 20-second recipe video for:
 Recipe: ${recipe.name}
 Cuisine: ${recipe.cuisine}
 Ingredients: ${recipe.ingredients.slice(0, 20).join(', ')}
-Steps: ${recipe.steps.slice(0, 10).join('. ')}`;
+Steps: ${recipe.steps.slice(0, 10).join('. ')}
+IMPORTANT: Make each imagePrompt hyper-realistic with professional food photography details. Think Bon Appétit magazine quality.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -105,7 +107,7 @@ Steps: ${recipe.steps.slice(0, 10).join('. ')}`;
             headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
             body: JSON.stringify({
               model: "google/gemini-2.5-flash-image-preview",
-              messages: [{ role: "user", content: scene.imagePrompt || `Professional food photography of ${recipe.name}, ${scene.visual}` }],
+              messages: [{ role: "user", content: `Generate a photorealistic, ultra high quality food photography image: ${scene.imagePrompt || `Professional food photography of ${recipe.name}, ${scene.visual}. Shot with a 50mm lens, warm directional lighting, shallow depth of field, styled on a rustic wooden surface.`}` }],
               modalities: ["image", "text"],
             }),
           });
