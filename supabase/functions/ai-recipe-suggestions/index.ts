@@ -86,7 +86,18 @@ Generate recipe suggestions that make the best use of these ingredients.`;
 
     if (!response.ok) {
       if (response.status === 429) return new Response(JSON.stringify({ error: "Too many requests." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      if (response.status === 402) return new Response(JSON.stringify({ error: "Service temporarily unavailable." }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      if (response.status === 402) {
+        console.warn("AI gateway returned 402, using fallback recipes");
+        const fallback = {
+          recipes: [
+            { name: "Aloo Gobi", cuisine: "North Indian", prepTime: 10, cookTime: 25, servings: 4, difficulty: "Easy", ingredients: ["potatoes", "cauliflower", "onion", "tomato", "turmeric", "cumin"], steps: ["Cut vegetables", "Heat oil and add cumin", "Add onions and tomatoes", "Add potatoes and cauliflower", "Cook until tender"], nutritionPerServing: { calories: 180, protein: "5g", carbs: "28g", fat: "6g" }, tips: ["Add green peas for extra protein"], pairsWith: ["Roti", "Rice"] },
+            { name: "Dal Tadka", cuisine: "North Indian", prepTime: 5, cookTime: 30, servings: 4, difficulty: "Easy", ingredients: ["toor dal", "onion", "tomato", "garlic", "cumin", "ghee"], steps: ["Wash and pressure cook dal", "Prepare tadka with ghee and spices", "Mix tadka into dal", "Garnish with coriander"], nutritionPerServing: { calories: 220, protein: "12g", carbs: "32g", fat: "5g" }, tips: ["Use ghee for authentic flavor"], pairsWith: ["Rice", "Roti"] },
+            { name: "Vegetable Pulao", cuisine: "Indian", prepTime: 15, cookTime: 20, servings: 4, difficulty: "Easy", ingredients: ["basmati rice", "mixed vegetables", "whole spices", "ghee"], steps: ["Soak rice", "Sauté spices and vegetables", "Add rice and water", "Cook until done"], nutritionPerServing: { calories: 280, protein: "6g", carbs: "52g", fat: "5g" }, tips: ["Soak rice for 30 min for fluffy results"], pairsWith: ["Raita", "Papad"] },
+          ],
+          shoppingList: []
+        };
+        return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
       throw new Error("AI service error");
     }
 
