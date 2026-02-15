@@ -78,9 +78,19 @@ interface GeneratedPlan {
 }
 
 const toArray = (val: unknown): string[] => {
-  if (Array.isArray(val)) return val.map(String);
+  if (Array.isArray(val)) return val.map(v => typeof v === 'object' ? JSON.stringify(v) : String(v));
   if (typeof val === 'string') return val.split(',').map(s => s.trim()).filter(Boolean);
+  if (val && typeof val === 'object') return Object.entries(val).map(([k, v]) => `${k}: ${v}`);
   return [];
+};
+
+const safeString = (val: unknown): string => {
+  if (typeof val === 'string') return val;
+  if (typeof val === 'number') return String(val);
+  if (val && typeof val === 'object') {
+    try { return JSON.stringify(val); } catch { return ''; }
+  }
+  return '';
 };
 
 const AIGroceryPlanner = ({ household, onClose, onPlanGenerated }: AIGroceryPlannerProps) => {
@@ -589,7 +599,7 @@ const AIGroceryPlanner = ({ household, onClose, onPlanGenerated }: AIGroceryPlan
                         <Sparkles className="w-4 h-4 text-primary" />
                         AI Insights
                       </h4>
-                      <p className="text-sm text-muted-foreground">{generatedPlan.explanation}</p>
+                      <p className="text-sm text-muted-foreground">{safeString(generatedPlan.explanation)}</p>
                     </div>
                   )}
                 </TabsContent>
