@@ -107,8 +107,13 @@ Generate 30-50 items covering all essential categories. Prices should be realist
     });
 
     if (!response.ok) {
-      if (response.status === 429) return new Response(JSON.stringify({ error: "Rate limits exceeded" }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      if (response.status === 402) return new Response(JSON.stringify({ error: "Payment required" }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      if (response.status === 429) return new Response(JSON.stringify({ error: "Rate limits exceeded. Please try again in a moment." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      if (response.status === 402) {
+        // Fallback to generated plan when AI gateway quota is exceeded
+        console.warn("AI gateway returned 402, using fallback plan");
+        const fallback = getFallbackPlan(householdContext);
+        return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
       throw new Error("AI gateway error");
     }
 
