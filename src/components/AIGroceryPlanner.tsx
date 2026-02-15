@@ -404,42 +404,28 @@ const AIGroceryPlanner = ({ household, onClose, onPlanGenerated }: AIGroceryPlan
                               key={idx}
                               className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl hover:bg-muted transition-colors border border-transparent hover:border-primary/10"
                             >
-                              {/* Item icon placeholder */}
                               <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 text-lg">
                                 {getCategoryIcon(item.category)}
                               </div>
                               <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 flex-wrap">
-                                  <p className="font-semibold text-sm">{item.name}</p>
+                                <p className="font-semibold text-sm">
+                                  {item.name} — {item.quantity}{item.unit}
+                                </p>
+                                <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                                   {item.priority && (
                                     <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0", getPriorityColor(item.priority))}>
                                       {item.priority}
                                     </Badge>
                                   )}
-                                  {item.ageGroup && item.ageGroup !== 'all' && (
-                                    <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
-                                      {item.ageGroup}
-                                    </Badge>
-                                  )}
-                                </div>
-                                <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
-                                  <span className="font-medium">{item.quantity} {item.unit}</span>
                                   {item.nutritionHighlight && (
-                                    <span className="flex items-center gap-1 text-primary/80">
+                                    <span className="flex items-center gap-1 text-xs text-primary/80">
                                       <Leaf className="w-3 h-3" />
                                       {item.nutritionHighlight}
                                     </span>
                                   )}
                                 </div>
                               </div>
-                              <div className="text-right shrink-0">
-                                <p className="font-bold text-primary text-base">₹{(item.estimated_price || 0).toLocaleString()}</p>
-                                {item.quantity > 1 && (
-                                  <p className="text-[10px] text-muted-foreground">
-                                    ₹{Math.round((item.estimated_price || 0) / item.quantity)}/{item.unit}
-                                  </p>
-                                )}
-                              </div>
+                              <p className="font-bold text-primary text-base shrink-0">₹{(item.estimated_price || 0).toLocaleString()}</p>
                             </div>
                           ))}
                         </div>
@@ -459,12 +445,32 @@ const AIGroceryPlanner = ({ household, onClose, onPlanGenerated }: AIGroceryPlan
                 </TabsContent>
 
                 <TabsContent value="nutrition" className="mt-4 space-y-4">
+                  {/* Per-item nutrition highlights */}
+                  {generatedPlan.groceryItems?.some(i => i.nutritionHighlight) && (
+                    <div className="p-4 rounded-xl bg-muted/50 border">
+                      <h4 className="font-semibold text-sm mb-3 flex items-center gap-2">
+                        <Apple className="w-4 h-4 text-primary" />
+                        Item Nutrition Highlights
+                      </h4>
+                      <div className="grid gap-1.5">
+                        {(generatedPlan.groceryItems || []).filter(i => i.nutritionHighlight).map((item, idx) => (
+                          <div key={idx} className="flex items-center justify-between text-sm py-1.5 px-2 rounded-lg hover:bg-muted">
+                            <span className="font-medium">{item.name} ({item.quantity}{item.unit})</span>
+                            <span className="text-xs text-primary/80 flex items-center gap-1">
+                              <Leaf className="w-3 h-3" /> {item.nutritionHighlight}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   {generatedPlan.nutritionSummary && (
                     <>
                       <div className="grid grid-cols-2 gap-3">
-                        <div className="p-4 rounded-xl bg-orange-500/5 border border-orange-500/10">
+                        <div className="p-4 rounded-xl bg-primary/5 border border-primary/10">
                           <div className="flex items-center gap-2 mb-2">
-                            <Zap className="w-4 h-4 text-orange-500" />
+                            <Zap className="w-4 h-4 text-primary" />
                             <h4 className="font-semibold text-sm">Protein Sources</h4>
                           </div>
                           <div className="flex flex-wrap gap-1">
@@ -473,9 +479,9 @@ const AIGroceryPlanner = ({ household, onClose, onPlanGenerated }: AIGroceryPlan
                             ))}
                           </div>
                         </div>
-                        <div className="p-4 rounded-xl bg-green-500/5 border border-green-500/10">
+                        <div className="p-4 rounded-xl bg-primary/5 border border-primary/10">
                           <div className="flex items-center gap-2 mb-2">
-                            <Leaf className="w-4 h-4 text-green-500" />
+                            <Leaf className="w-4 h-4 text-primary" />
                             <h4 className="font-semibold text-sm">Fiber Rich</h4>
                           </div>
                           <div className="flex flex-wrap gap-1">
@@ -484,9 +490,9 @@ const AIGroceryPlanner = ({ household, onClose, onPlanGenerated }: AIGroceryPlan
                             ))}
                           </div>
                         </div>
-                        <div className="p-4 rounded-xl bg-blue-500/5 border border-blue-500/10">
+                        <div className="p-4 rounded-xl bg-primary/5 border border-primary/10">
                           <div className="flex items-center gap-2 mb-2">
-                            <Milk className="w-4 h-4 text-blue-500" />
+                            <Milk className="w-4 h-4 text-primary" />
                             <h4 className="font-semibold text-sm">Calcium Rich</h4>
                           </div>
                           <div className="flex flex-wrap gap-1">
@@ -495,9 +501,9 @@ const AIGroceryPlanner = ({ household, onClose, onPlanGenerated }: AIGroceryPlan
                             ))}
                           </div>
                         </div>
-                        <div className="p-4 rounded-xl bg-red-500/5 border border-red-500/10">
+                        <div className="p-4 rounded-xl bg-primary/5 border border-primary/10">
                           <div className="flex items-center gap-2 mb-2">
-                            <Heart className="w-4 h-4 text-red-500" />
+                            <Heart className="w-4 h-4 text-primary" />
                             <h4 className="font-semibold text-sm">Iron Rich</h4>
                           </div>
                           <div className="flex flex-wrap gap-1">
@@ -507,44 +513,50 @@ const AIGroceryPlanner = ({ household, onClose, onPlanGenerated }: AIGroceryPlan
                           </div>
                         </div>
                       </div>
-
-                      {generatedPlan.budgetBreakdown && (
-                        <div className="p-4 rounded-xl bg-muted/50 border">
-                          <h4 className="font-semibold text-sm mb-3 flex items-center gap-2">
-                            <Wallet className="w-4 h-4" />
-                            Budget Breakdown
-                          </h4>
-                          <div className="space-y-2">
-                            {Object.entries(generatedPlan.budgetBreakdown)
-                              .filter(([, val]) => typeof val === 'number')
-                              .map(([cat, amount]) => (
-                              <div key={cat} className="flex items-center gap-2">
-                                <span className="text-xs capitalize w-20">{cat}</span>
-                                <Progress value={totalCost > 0 ? ((amount as number) / totalCost) * 100 : 0} className="flex-1 h-2" />
-                                <span className="text-xs font-medium w-16 text-right">₹{(amount as number).toLocaleString()}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
                     </>
+                  )}
+
+                  {generatedPlan.budgetBreakdown && (
+                    <div className="p-4 rounded-xl bg-muted/50 border">
+                      <h4 className="font-semibold text-sm mb-3 flex items-center gap-2">
+                        <Wallet className="w-4 h-4" />
+                        Budget Breakdown
+                      </h4>
+                      <div className="space-y-2">
+                        {Object.entries(generatedPlan.budgetBreakdown)
+                          .filter(([, val]) => typeof val === 'number')
+                          .map(([cat, amount]) => (
+                          <div key={cat} className="flex items-center gap-2">
+                            <span className="text-xs capitalize w-20">{cat}</span>
+                            <Progress value={totalCost > 0 ? ((amount as number) / totalCost) * 100 : 0} className="flex-1 h-2" />
+                            <span className="text-xs font-medium w-16 text-right">₹{(amount as number).toLocaleString()}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   )}
                 </TabsContent>
 
-                <TabsContent value="meals" className="mt-4">
-                  {generatedPlan.nutritionSummary?.weeklyMealIdeas && (
+                <TabsContent value="meals" className="mt-4 space-y-4">
+                  {toArray(generatedPlan.nutritionSummary?.weeklyMealIdeas).length > 0 && (
                     <div className="space-y-2">
                       <h4 className="font-semibold text-sm flex items-center gap-2 mb-3">
                         <Calendar className="w-4 h-4" />
                         Weekly Meal Suggestions
                       </h4>
                       {toArray(generatedPlan.nutritionSummary?.weeklyMealIdeas).map((meal, idx) => (
-                        <div key={idx} className="p-3 bg-muted/50 rounded-lg flex items-start gap-3">
-                          <span className="text-2xl">🍽️</span>
-                          <p className="text-sm">{meal}</p>
+                        <div key={idx} className="p-3 bg-muted/50 rounded-xl flex items-start gap-3 border border-transparent hover:border-primary/10 transition-colors">
+                          <span className="text-xl mt-0.5">🍽️</span>
+                          <div>
+                            <p className="text-sm font-medium">Day {idx + 1}</p>
+                            <p className="text-sm text-muted-foreground">{meal}</p>
+                          </div>
                         </div>
                       ))}
                     </div>
+                  )}
+                  {toArray(generatedPlan.nutritionSummary?.weeklyMealIdeas).length === 0 && (
+                    <p className="text-sm text-muted-foreground text-center py-8">No meal ideas generated. Try regenerating the plan.</p>
                   )}
                 </TabsContent>
 
