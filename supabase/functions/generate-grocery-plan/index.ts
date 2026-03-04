@@ -97,7 +97,7 @@ Generate 30-50 items covering all essential categories. Prices should be realist
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "google/gemini-3-flash-preview",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: prompt || `Create a smart ${planType} grocery plan optimized for my household.` },
