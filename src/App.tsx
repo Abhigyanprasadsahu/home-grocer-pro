@@ -13,6 +13,7 @@ import MyPlan from "./pages/MyPlan";
 import Checkout from "./pages/Checkout";
 import Orders from "./pages/Orders";
 import NotFound from "./pages/NotFound";
+import SplashScreen from "./components/SplashScreen";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,7 @@ const App = () => (
         <TooltipProvider>
           <Toaster />
           <Sonner />
+          <SplashScreen />
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
