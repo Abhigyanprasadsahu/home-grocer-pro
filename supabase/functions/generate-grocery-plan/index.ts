@@ -69,26 +69,43 @@ serve(async (req) => {
 
     const currentMonth = new Date().toLocaleString('default', { month: 'long' });
     const currentSeason = getSeason();
+    const budgetNum = Number(householdContext.budget) || 10000;
+    const targetSpend = Math.round(budgetNum * 0.95); // leave 5% buffer
     
-    const systemPrompt = `You are an advanced AI nutritionist and grocery planning expert specializing in Indian households. You create personalized, budget-optimized, and nutritionally balanced grocery plans.
+    const systemPrompt = `You are an expert Indian household grocery planner. You MUST strictly respect the user's monthly budget.
 
 HOUSEHOLD PROFILE:
-- Total Family Size: ${householdContext.familySize} members
-- Adults: ${householdContext.adults || householdContext.familySize}
-- Children: ${householdContext.children || 0}
-- Elderly: ${householdContext.elderly || 0}
-- Monthly Budget: ₹${householdContext.budget}
-- Diet Preferences: ${householdContext.dietPreferences?.join(', ') || 'vegetarian'}
+- Family Size: ${householdContext.familySize} (Adults: ${householdContext.adults || householdContext.familySize}, Children: ${householdContext.children || 0}, Elderly: ${householdContext.elderly || 0})
+- MONTHLY BUDGET: ₹${budgetNum} (HARD LIMIT — total of all estimated_price values MUST be ≤ ₹${targetSpend})
+- Diet: ${householdContext.dietPreferences?.join(', ') || 'vegetarian'}
 - Special Requirements: ${householdContext.specialRequirements || 'None'}
-- Preferred Stores: ${householdContext.preferredStores?.join(', ') || 'Any'}
+- Month: ${currentMonth} (${currentSeason})
 
-CURRENT CONTEXT:
-- Month: ${currentMonth}
-- Season: ${currentSeason}
-- Plan Type: ${planType}
+CRITICAL BUDGET RULES:
+1. SUM of all groceryItems[].estimated_price MUST be between ₹${Math.round(budgetNum * 0.85)} and ₹${targetSpend}.
+2. If budget is low (<₹5000) → fewer items, prioritize staples (rice, atta, dal, oil, milk, basic vegetables).
+3. If budget is high (>₹20000) → more variety, premium items, fruits, dry fruits, snacks.
+4. Use REALISTIC current Indian market prices (₹/kg or ₹/L):
+   - Basmati rice ₹80-120/kg, atta ₹40-50/kg, toor dal ₹140-180/kg, moong dal ₹120-160/kg
+   - Milk ₹55-70/L, paneer ₹350-400/kg, curd ₹60-80/kg
+   - Onion ₹30-50/kg, potato ₹25-40/kg, tomato ₹30-80/kg (seasonal)
+   - Apple ₹150-220/kg, banana ₹50-70/dozen
+   - Refined oil ₹130-160/L, ghee ₹550-700/kg
+   - Sugar ₹45-55/kg, tea ₹400-600/kg
 
-You MUST respond with a valid JSON object with groceryItems, nutritionSummary, budgetBreakdown, seasonalTips, savingsTips, and explanation fields.
-Generate 30-50 items covering all essential categories. Prices should be realistic Indian market rates for ${currentMonth}.`;
+OUTPUT — respond with ONLY a valid JSON object (no markdown, no prose). Schema:
+{
+  "groceryItems": [
+    { "name": string, "category": string, "quantity": number, "unit": string, "estimated_price": number (INR, integer), "nutritionHighlight": string, "priority": "essential"|"recommended"|"optional" }
+  ],
+  "nutritionSummary": { "proteinSources": string[], "fiberRich": string[], "calciumRich": string[], "ironRich": string[], "weeklyMealIdeas": string[] },
+  "budgetBreakdown": { "vegetables": number, "fruits": number, "dairy": number, "grains": number, "pulses": number, "oils": number, "spices": number, "snacks": number, "beverages": number, "protein": number },
+  "seasonalTips": string[],
+  "savingsTips": string[],
+  "explanation": string
+}
+
+estimated_price is REQUIRED on every item and MUST be a positive integer in INR. Double-check the sum before responding.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -100,16 +117,16 @@ Generate 30-50 items covering all essential categories. Prices should be realist
         model: "google/gemini-3-flash-preview",
         messages: [
           { role: "system", content: systemPrompt },
-          { role: "user", content: prompt || `Create a smart ${planType} grocery plan optimized for my household.` },
+          { role: "user", content: prompt || `Create a ${planType} grocery plan that fits within ₹${budgetNum}.` },
         ],
-        temperature: 0.7,
+        temperature: 0.5,
+        response_format: { type: "json_object" },
       }),
     });
 
     if (!response.ok) {
       if (response.status === 429) return new Response(JSON.stringify({ error: "Rate limits exceeded. Please try again in a moment." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       if (response.status === 402) {
-        // Fallback to generated plan when AI gateway quota is exceeded
         console.warn("AI gateway returned 402, using fallback plan");
         const fallback = getFallbackPlan(householdContext);
         return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
@@ -128,6 +145,35 @@ Generate 30-50 items covering all essential categories. Prices should be realist
     } catch {
       parsedContent = getFallbackPlan(householdContext);
     }
+
+    // Normalize: ensure every item has a numeric estimated_price
+    if (Array.isArray(parsedContent.groceryItems)) {
+      parsedContent.groceryItems = parsedContent.groceryItems.map((it: any) => {
+        const price = Number(
+          it.estimated_price ?? it.estimatedPrice ?? it.price ?? it.cost ?? 0
+        );
+        return {
+          name: String(it.name ?? "Item"),
+          category: String(it.category ?? "Other"),
+          quantity: Number(it.quantity) || 1,
+          unit: String(it.unit ?? "pcs"),
+          estimated_price: Number.isFinite(price) && price > 0 ? Math.round(price) : 50,
+          nutritionHighlight: it.nutritionHighlight ?? it.nutrition ?? "",
+          priority: it.priority ?? "recommended",
+        };
+      });
+
+      // Budget enforcement: if AI overshoots, scale proportionally
+      const total = parsedContent.groceryItems.reduce((s: number, i: any) => s + i.estimated_price, 0);
+      if (total > targetSpend && total > 0) {
+        const factor = targetSpend / total;
+        parsedContent.groceryItems = parsedContent.groceryItems.map((i: any) => ({
+          ...i,
+          estimated_price: Math.max(10, Math.round(i.estimated_price * factor)),
+        }));
+      }
+    }
+
 
     return new Response(JSON.stringify(parsedContent), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
