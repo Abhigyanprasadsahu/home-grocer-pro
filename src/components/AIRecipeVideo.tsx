@@ -64,8 +64,8 @@ const AIRecipeVideo = ({ isOpen, onClose, recipe: initialRecipe }: AIRecipeVideo
     cookTime: 30,
   });
   
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const progressRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const progressRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Get the active recipe (custom or initial)
   const activeRecipe = showCustomForm ? customRecipe : initialRecipe;
