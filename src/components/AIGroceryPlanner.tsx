@@ -194,7 +194,7 @@ const AIGroceryPlanner = ({ household, onClose, onPlanGenerated }: AIGroceryPlan
     }
   };
 
-  const totalCost = generatedPlan?.groceryItems?.reduce((sum, item) => sum + item.estimated_price, 0) || 0;
+  const totalCost = generatedPlan?.groceryItems?.reduce((sum, item) => sum + (Number(item.estimated_price ?? (item as any).price) || 0), 0) || 0;
   const itemsByCategory = generatedPlan?.groceryItems?.reduce((acc, item) => {
     if (!acc[item.category]) acc[item.category] = [];
     acc[item.category].push(item);
@@ -412,7 +412,7 @@ const AIGroceryPlanner = ({ household, onClose, onPlanGenerated }: AIGroceryPlan
                                 )}
                               </div>
                             </div>
-                            <span className="font-bold text-primary">₹{item.estimated_price}</span>
+                            <span className="font-bold text-primary whitespace-nowrap">₹{Number(item.estimated_price ?? (item as any).price ?? 0).toLocaleString('en-IN')}</span>
                           </div>
                         ))}
                       </div>
