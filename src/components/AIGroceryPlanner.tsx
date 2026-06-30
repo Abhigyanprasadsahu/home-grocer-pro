@@ -430,7 +430,7 @@ const AIGroceryPlanner = ({ household, onClose, onPlanGenerated }: AIGroceryPlan
                             <h4 className="font-semibold text-sm">Protein Sources</h4>
                           </div>
                           <div className="flex flex-wrap gap-1">
-                            {generatedPlan.nutritionSummary.proteinSources.map((item, idx) => (
+                            {(Array.isArray(generatedPlan.nutritionSummary.proteinSources) ? generatedPlan.nutritionSummary.proteinSources : []).map((item, idx) => (
                               <Badge key={idx} variant="secondary" className="text-xs">{item}</Badge>
                             ))}
                           </div>
@@ -441,7 +441,7 @@ const AIGroceryPlanner = ({ household, onClose, onPlanGenerated }: AIGroceryPlan
                             <h4 className="font-semibold text-sm">Fiber Rich</h4>
                           </div>
                           <div className="flex flex-wrap gap-1">
-                            {generatedPlan.nutritionSummary.fiberRich.map((item, idx) => (
+                            {(Array.isArray(generatedPlan.nutritionSummary.fiberRich) ? generatedPlan.nutritionSummary.fiberRich : []).map((item, idx) => (
                               <Badge key={idx} variant="secondary" className="text-xs">{item}</Badge>
                             ))}
                           </div>
@@ -452,7 +452,7 @@ const AIGroceryPlanner = ({ household, onClose, onPlanGenerated }: AIGroceryPlan
                             <h4 className="font-semibold text-sm">Calcium Rich</h4>
                           </div>
                           <div className="flex flex-wrap gap-1">
-                            {generatedPlan.nutritionSummary.calciumRich.map((item, idx) => (
+                            {(Array.isArray(generatedPlan.nutritionSummary.calciumRich) ? generatedPlan.nutritionSummary.calciumRich : []).map((item, idx) => (
                               <Badge key={idx} variant="secondary" className="text-xs">{item}</Badge>
                             ))}
                           </div>
@@ -463,7 +463,7 @@ const AIGroceryPlanner = ({ household, onClose, onPlanGenerated }: AIGroceryPlan
                             <h4 className="font-semibold text-sm">Iron Rich</h4>
                           </div>
                           <div className="flex flex-wrap gap-1">
-                            {generatedPlan.nutritionSummary.ironRich.map((item, idx) => (
+                            {(Array.isArray(generatedPlan.nutritionSummary.ironRich) ? generatedPlan.nutritionSummary.ironRich : []).map((item, idx) => (
                               <Badge key={idx} variant="secondary" className="text-xs">{item}</Badge>
                             ))}
                           </div>
